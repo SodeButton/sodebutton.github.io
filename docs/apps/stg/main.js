@@ -51,11 +51,15 @@ let player_bullets = [];
 let enemies = [];
 let enemy_bullets = [];
 
+let explosions = [];
+
 let distance = {x: 0, y: 0};
 let isDown = false;
 
 let score_text;
 let heart = [];
+
+let se = {};
 
 class GameScene extends Phaser.Scene {
 	constructor() {
@@ -64,39 +68,72 @@ class GameScene extends Phaser.Scene {
 
 	preload() {
 		this.load.setPath("./Resources/");
+
 		this.load.image("player", "./Sprites/player.png");
 		this.load.image("enemy", "./Sprites/enemy.png");
 		this.load.image("heart", "./Sprites/heart.png");
+
 		this.load.spritesheet("player_bullet", "./Sprites/missile1.png", {frameWidth: 10, frameHeight: 16});
 		this.load.spritesheet("enemy_bullet", "./Sprites/missile2.png", {frameWidth: 10, frameHeight: 16});
+		this.load.spritesheet("explosion", "./Sprites/explosion.png", {frameWidth: 32, frameHeight: 32});
+
+		this.load.audio("shoot1", "./Audios/Shoot1.wav");
+		this.load.audio("shoot4", "./Audios/Shoot4.wav");
+		this.load.audio("explosion1", "./Audios/Explosion1.wav");
 	}
 
 	create() {
-		player = this.add.image(400, 800, "player");
+		this.spawnTime = 0;
+		this.score = 0;
+
+		player = this.add.sprite(400, 800, "player");
 		player.timer = 0;
 		player.max_hp = 3;
 		player.hp = player.max_hp;
-		this.spawnTime = 0;
-		this.score = 0;
+		player.cool_time = 0;
 		for(let i = player.max_hp - 1; i >= 0; i--) {
 			heart[i] = this.add.image(this.scale.width - 64 * i - 32, 32, "heart");
 			heart[i].scale = 2;
 		}
+
+		se.shoot_1     = this.sound.add("shoot1");
+		se.shoot_4     = this.sound.add("shoot4");
+		se.explosion_1 = this.sound.add("explosion1");
+		se.shoot_1.volume     = 0.2;
+		se.shoot_4.volume     = 0.2;
+		se.explosion_1.volume = 0.2;
+
+		this.anims.create({
+			key: 'explode',
+			frames: this.anims.generateFrameNumbers('explosion', { start: 0, end: 6 }),
+			frameRate: 10,
+			repeat: 0
+		});
 
 		score_text = this.add.text(10, 10, "SCORE：" + this.score, {fontSize:"40px", fontFamily:"pixelFont"});
 	}
 
 	update(time, delta) {
 		if(player.active) {
-			console.log(player.hp);
 			player.timer += delta / 1000;
+			if(player.cool_time > 0) {
+				player.cool_time -= delta / 1000;
+				if(player.cool_time <= 0) {
+					player.cool_time = 0;
+					player.alpha = 1;
+				} else {
+					player.alpha = Math.sin(player.cool_time * 90 * 15 * Math.PI / 180.0);
+				}
+
+			}
 			if(player.timer >= 0.1) {
 				player.timer -= 0.1;
-				let bullet = this.add.image(player.x, player.y, "player_bullet");
+				let bullet = this.add.sprite(player.x, player.y, "player_bullet");
 				bullet.dx = 0;
 				bullet.dy = -10;
 				bullet.angle = 180;
 				player_bullets.push(bullet);
+				se.shoot_1.play();
 			}
 
 			let pointer = this.input.activePointer;
@@ -123,7 +160,7 @@ class GameScene extends Phaser.Scene {
 		this.spawnTime += delta / 1000;
 		if(this.spawnTime >= 2.0) {
 			this.spawnTime -= 2.0;
-			let enemy = this.add.image(Math.floor(Math.random() * 800), -32, "enemy");
+			let enemy = this.add.sprite(Math.floor(Math.random() * 800), -32, "enemy");
 			enemy.dx = 0;
 			enemy.dy = 4;
 			enemy.timer = 0;
@@ -141,15 +178,33 @@ class GameScene extends Phaser.Scene {
 					enemy.timer -= 1.0;
 
 					for(let i = 0; i < 360; i+=30) {
-						let bullet = this.add.image(enemy.x, enemy.y, "enemy_bullet");
+						let bullet = this.add.sprite(enemy.x, enemy.y, "enemy_bullet");
 						bullet.dx = 6 * Math.cos((enemy.bulletAngle[0] + i) * Math.PI / 180.0);
 						bullet.dy = 6 * Math.sin((enemy.bulletAngle[0] + i) * Math.PI / 180.0);
 						bullet.angle = (enemy.bulletAngle[0] + i) - 90;
 						enemy_bullets.push(bullet);
+						se.shoot_4.play();
 					}
 					//enemy.bulletAngle[0] += 1;
 				}
 				if(enemy.y > 1200 + enemy.height / 2) enemy.destroy();
+
+				if(player.active && player.cool_time <= 0) {
+					if (enemy.x - enemy.width  / 2 < player.x + player.width  / 2 && enemy.x + enemy.width  / 2 > player.x - player.width  / 2 &&
+						enemy.y - enemy.height / 2 < player.y + player.height / 2 && enemy.y + enemy.height / 2 > player.y - player.height / 2) {
+						enemy.destroy();
+						player.hp--;
+						heart[player.hp].destroy();
+						if(player.hp <= 0) player.destroy();
+						player.cool_time = 1.0;
+						se.explosion_1.play();
+
+						let effect = this.add.sprite(enemy.x, enemy.y, "explosion");
+						effect.anims.play("explode", true);
+						effect.endTime = 0.6;
+						explosions.push(effect);
+					}
+				}
 			} else {
 				enemies.some((v, i) => {
 					if (v === enemy) enemies.splice(i,1);
@@ -179,6 +234,11 @@ class GameScene extends Phaser.Scene {
 						enemy.destroy();
 						this.score += 100;
 						score_text.text = "SCORE：" + this.score;
+						se.explosion_1.play();
+						let effect = this.add.sprite(enemy.x, enemy.y, "explosion");
+						effect.anims.play("explode", true);
+						effect.endTime = 0.6;
+						explosions.push(effect);
 						break;
 					}
 				}
@@ -192,13 +252,19 @@ class GameScene extends Phaser.Scene {
 
 				if(bullet.y > 1200 + bullet.height / 2) bullet.destroy();
 
-				if(player.active) {
+				if(player.active && player.cool_time <= 0) {
 					if (bullet.x - bullet.width  / 2 < player.x + player.width  / 2 && bullet.x + bullet.width  / 2 > player.x - player.width  / 2 &&
 						bullet.y - bullet.height / 2 < player.y + player.height / 2 && bullet.y + bullet.height / 2 > player.y - player.height / 2) {
 						bullet.destroy();
 						player.hp--;
 						heart[player.hp].destroy();
 						if(player.hp <= 0) player.destroy();
+						player.cool_time = 1.0;
+						se.explosion_1.play();
+						let effect = this.add.sprite(player.x, player.y, "explosion");
+						effect.anims.play("explode", true);
+						effect.endTime = 0.6;
+						explosions.push(effect);
 					}
 				}
 
@@ -208,6 +274,20 @@ class GameScene extends Phaser.Scene {
 				});
 			}
 		}
+
+		for(let explosion of explosions) {
+			if(explosion.active) {
+				explosion.endTime -= delta / 1000;
+				if(explosion.endTime <= 0) {
+					explosion.destroy();
+				}
+			} else {
+				explosions.some((v, i) => {
+					if (v === explosion) explosions.splice(i,1);
+				});
+			}
+		}
+
 	}
 }
 
@@ -220,13 +300,7 @@ const config = {
 		mode: Phaser.Scale.FIT,
 		autoCenter: Phaser.Scale.CENTER_HORIZONTALLY
 	},
-	render: {
-		pixelArt: true
-	},
-	// fps: {
-	// 	target: 60,
-	// 	forceSetTimeOut: true
-	// },
+	pixelArt: true,
 	physics: {
 		default: 'arcade',
 		arcade: {
