@@ -117,8 +117,8 @@ class GameScene extends Phaser.Scene {
 
 		for(let enemy of enemies) {
 			if(enemy.active) {
-				enemy.x += enemy.dx;
-				enemy.y += enemy.dy;
+				enemy.x += enemy.dx * delta * 0.1;
+				enemy.y += enemy.dy * delta * 0.1;
 				enemy.timer += delta / 1000;
 				if(enemy.timer >= 1.0) {
 					enemy.timer -= 1.0;
@@ -142,8 +142,8 @@ class GameScene extends Phaser.Scene {
 
 		for (let bullet of player_bullets) {
 			if(bullet.active) {
-				bullet.x += bullet.dx;
-				bullet.y += bullet.dy;
+				bullet.x += bullet.dx * delta * 0.1;
+				bullet.y += bullet.dy * delta * 0.1;
 
 				if (bullet.y > 1200 + bullet.height / 2 || bullet.y < 0 - bullet.height / 2 ||
 					bullet.x > 800  + bullet.width  / 2 || bullet.x < 0 - bullet.width  / 2) bullet.destroy();
@@ -170,8 +170,8 @@ class GameScene extends Phaser.Scene {
 
 		for (let bullet of enemy_bullets) {
 			if(bullet.active) {
-				bullet.x += bullet.dx;
-				bullet.y += bullet.dy;
+				bullet.x += bullet.dx * delta * 0.1;
+				bullet.y += bullet.dy * delta * 0.1;
 
 				if(bullet.y > 1200 + bullet.height / 2) bullet.destroy();
 
@@ -206,10 +206,10 @@ const config = {
 	render: {
 		pixelArt: true
 	},
-	fps: {
-		target: 60,
-		forceSetTimeOut: true
-	},
+	// fps: {
+	// 	target: 60,
+	// 	forceSetTimeOut: true
+	// },
 	physics: {
 		default: 'arcade',
 		arcade: {
