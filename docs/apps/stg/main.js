@@ -4,6 +4,9 @@
  */
 "use strict";
 
+let isClick = false;
+let fadeTime = 0;
+let fade;
 class StartScene extends Phaser.Scene {
 	constructor() {
 		super({key: 'startScene'});
@@ -12,7 +15,6 @@ class StartScene extends Phaser.Scene {
 	preload() {
 		this.load.setPath("./Resources/");
 	}
-
 	create() {
 		let title = this.add.text(400, 200, "ShootingGame", {fontSize: "100px", fontFamily:"pixelFont"});
 		title.x -= title.width / 2;
@@ -20,11 +22,26 @@ class StartScene extends Phaser.Scene {
 		let tapText = this.add.text(400, 1000, "Tap to Start", {fontSize: "40px", fontFamily:"pixelFont"});
 		tapText.x -= tapText.width / 2;
 		tapText.y -= tapText.height / 2;
+		fade = this.add.graphics();
+		fade.fillStyle(0x000000, 1).fillRect(0, 0, this.scale.width, this.scale.height);
+		fade.alpha = 0;
 		this.input.once('pointerup', function () {
-
-			this.scene.start('gameScene');
-
+			this.tweens.add({
+				targets: fade,
+				alpha: 1,
+				duration: 1000,
+				ease: 'Power2'
+			}, this);
+			isClick = true;
 		}, this);
+	}
+	update(time, delta) {
+		if(isClick) {
+			fadeTime += delta / 1000;
+			if(fadeTime >= 1.0) {
+				this.scene.start('gameScene');
+			}
+		}
 	}
 }
 
