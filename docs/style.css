@@ -63,13 +63,13 @@ header {
 .nav li {
 	border-radius: 10px;
 	border: 2px solid white;
-	box-shadow: 0px 0px 10px black;
+	box-shadow: 0 0 10px black;
 	background-color: lightslategray;
 	margin: 5px 3px;
 }
 
 .nav li:active {
-	box-shadow: 0px 0px 0px black;
+	box-shadow: 0 0 0 black;
 }
 
 .nav li:hover {
@@ -123,6 +123,7 @@ aside {
 	grid-area: right;
 	border-radius: 10px;
 	border: 2px solid white;
+	padding: 10px;
 }
 
 .search > form > input {
@@ -133,6 +134,7 @@ footer {
 	grid-area: footer;
 	border-radius: 10px;
 	border: 2px solid white;
+	padding: 20px;
 }
 
 @media screen and (max-width: 1000px) {
@@ -140,7 +142,7 @@ footer {
 		grid-template:
 			"header" 150px
 			"......" 5px
-			"left  " 50px
+			"left  " 100px
 			"......" 5px
 			"center" 1fr
 			"......" 5px
@@ -161,6 +163,12 @@ footer {
 	.nav li {
 		width: 100px;
 		margin: auto 3px;
+	}
+
+	main h3 {
+		margin: 20px auto;
+		font-size: 2em;
+		text-align: center;
 	}
 }
 
