@@ -7,21 +7,77 @@
 let isClick = false;
 let fadeTime = 0;
 let fade;
+
+class LoadScene extends Phaser.Scene {
+	constructor() {
+		super({key: 'loadScene'});
+	}
+
+	preload() {
+
+		let progressBar = this.add.graphics();
+		let progressBox = this.add.graphics();
+		progressBox.fillStyle(0x222222, 0.8);
+		progressBox.fillRect(this.scale.width / 2 - 300, this.scale.height / 2 - 30, 600, 60);
+
+		let text = this.add.text(this.scale.width / 2, this.scale.height / 5 * 3,"load", {fontSize: "50px", fontFamily:"pixelFont"});
+		text.setOrigin(0.5, 0.5);
+
+		//ロードが進行したときの処理
+		this.load.on('progress', function (value) {
+			progressBar.clear();
+			progressBar.fillStyle(0xffffff, 1);
+			progressBar.fillRect(game.scale.width / 2 - 300, game.scale.height / 2 - 30, 600 * value, 60);
+		});
+
+		//ファイルのロードに入ったときの処理
+		this.load.on('fileprogress', function (file) {
+			text.text = file.key;
+		});
+
+		//すべてのロードが完了したときの処理
+		this.load.on('complete', function () {
+			text.text = 'complete';
+
+		});
+		this.load.setPath("./Resources/");
+
+		this.load.image("player", "./Sprites/player.png");
+		this.load.image("enemy", "./Sprites/enemy.png");
+		this.load.image("heart", "./Sprites/heart.png");
+
+		this.load.spritesheet("player_bullet", "./Sprites/missile1.png", {frameWidth: 10, frameHeight: 16});
+		this.load.spritesheet("enemy_bullet", "./Sprites/missile2.png", {frameWidth: 10, frameHeight: 16});
+		this.load.spritesheet("explosion", "./Sprites/explosion.png", {frameWidth: 32, frameHeight: 32});
+
+		this.load.audio("shoot1", "./Audios/Shoot1.wav");
+		this.load.audio("shoot4", "./Audios/Shoot4.wav");
+		this.load.audio("explosion1", "./Audios/Explosion1.wav");
+	}
+
+	create() {
+		this.scene.start('startScene');
+	}
+}
+let title, tapText, versionText, copyrightText;
 class StartScene extends Phaser.Scene {
 	constructor() {
 		super({key: 'startScene'});
 	}
 
-	preload() {
-		this.load.setPath("./Resources/");
-	}
 	create() {
-		let title = this.add.text(400, 200, "ShootingGame", {fontSize: "100px", fontFamily:"pixelFont"});
-		title.x -= title.width / 2;
-		title.y -= title.height / 2;
-		let tapText = this.add.text(400, 1000, "Tap to Start", {fontSize: "40px", fontFamily:"pixelFont"});
-		tapText.x -= tapText.width / 2;
-		tapText.y -= tapText.height / 2;
+		title = this.add.text(400, 200, "ShootingGame", {fontSize: "100px", fontFamily:"pixelFont"});
+		title.setOrigin(0.5, 0.5);
+
+		tapText = this.add.text(400, 1000, "Tap to Start", {fontSize: "40px", fontFamily:"pixelFont"});
+		tapText.setOrigin(0.5, 0.5);
+
+		versionText = this.add.text(10, this.scale.height - 10, "Version：0.0.1", {fontSize: "30px", fontFamily: "pixelFont"});
+		versionText.setOrigin(0, 1);
+
+		copyrightText = this.add.text(this.scale.width - 10, this.scale.height - 10, "©2021 Button501", {fontSize: "30px", fontFamily: "pixelFont"});
+		copyrightText.setOrigin(1, 1);
+
 		fade = this.add.graphics();
 		fade.fillStyle(0x000000, 1).fillRect(0, 0, this.scale.width, this.scale.height);
 		fade.alpha = 0;
@@ -36,6 +92,11 @@ class StartScene extends Phaser.Scene {
 		}, this);
 	}
 	update(time, delta) {
+		title.updateText();
+		tapText.updateText();
+		versionText.updateText();
+		copyrightText.updateText();
+
 		if(isClick) {
 			fadeTime += delta / 1000;
 			if(fadeTime >= 1.0) {
@@ -64,22 +125,6 @@ let se = {};
 class GameScene extends Phaser.Scene {
 	constructor() {
 		super({key: 'gameScene'});
-	}
-
-	preload() {
-		this.load.setPath("./Resources/");
-
-		this.load.image("player", "./Sprites/player.png");
-		this.load.image("enemy", "./Sprites/enemy.png");
-		this.load.image("heart", "./Sprites/heart.png");
-
-		this.load.spritesheet("player_bullet", "./Sprites/missile1.png", {frameWidth: 10, frameHeight: 16});
-		this.load.spritesheet("enemy_bullet", "./Sprites/missile2.png", {frameWidth: 10, frameHeight: 16});
-		this.load.spritesheet("explosion", "./Sprites/explosion.png", {frameWidth: 32, frameHeight: 32});
-
-		this.load.audio("shoot1", "./Audios/Shoot1.wav");
-		this.load.audio("shoot4", "./Audios/Shoot4.wav");
-		this.load.audio("explosion1", "./Audios/Explosion1.wav");
 	}
 
 	create() {
@@ -111,9 +156,11 @@ class GameScene extends Phaser.Scene {
 		});
 
 		score_text = this.add.text(10, 10, "SCORE：" + this.score, {fontSize:"40px", fontFamily:"pixelFont"});
+		score_text.updateText();
 	}
 
 	update(time, delta) {
+
 		if(player.active) {
 			player.timer += delta / 1000;
 			if(player.cool_time > 0) {
@@ -124,7 +171,6 @@ class GameScene extends Phaser.Scene {
 				} else {
 					player.alpha = Math.sin(player.cool_time * 90 * 15 * Math.PI / 180.0);
 				}
-
 			}
 			if(player.timer >= 0.1) {
 				player.timer -= 0.1;
@@ -154,6 +200,13 @@ class GameScene extends Phaser.Scene {
 			if(player.x > 800 + player.width / 2) player.x = 800 - player.width / 2;
 			if(player.y < player.height / 2) player.y = player.height / 2;
 			if(player.y > 1200 + player.height / 2) player.y = 1200 - player.height / 2;
+		} else {
+			delta = 0;
+			let gameOverText = this.add.text(this.scale.width / 2, this.scale.height / 3, "GAME OVER", {color:"red", fontSize: "100px", fontFamily:"pixelFont"});
+			gameOverText.setOrigin(0.5, 0.5);
+
+			let retryText = this.add.text(this.scale.width / 2, gameOverText.y + 200, "もう一度", {color:"green", fontSize: "50px", fontFamily:"pixelFont"});
+			retryText.setOrigin(0.5, 0.5);
 
 		}
 
@@ -287,7 +340,6 @@ class GameScene extends Phaser.Scene {
 				});
 			}
 		}
-
 	}
 }
 
@@ -307,7 +359,7 @@ const config = {
 			gravity: { y: 0 }
 		}
 	},
-	scene: [StartScene, GameScene]
+	scene: [LoadScene, StartScene, GameScene]
 };
 
 const game = new Phaser.Game(config);
