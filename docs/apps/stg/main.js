@@ -53,6 +53,7 @@ class LoadScene extends Phaser.Scene {
 		this.load.audio("shoot1", "./Audios/Shoot1.wav");
 		this.load.audio("shoot4", "./Audios/Shoot4.wav");
 		this.load.audio("explosion1", "./Audios/Explosion1.wav");
+		this.load.audio("bgm1", "./Audios/bgm1.ogg");
 	}
 
 	create() {
@@ -121,6 +122,7 @@ let score_text;
 let heart = [];
 
 let se = {};
+let bgm = {};
 
 class GameScene extends Phaser.Scene {
 	constructor() {
@@ -144,9 +146,14 @@ class GameScene extends Phaser.Scene {
 		se.shoot_1     = this.sound.add("shoot1");
 		se.shoot_4     = this.sound.add("shoot4");
 		se.explosion_1 = this.sound.add("explosion1");
-		se.shoot_1.volume     = 0.2;
+		se.shoot_1.volume     = 0.1;
 		se.shoot_4.volume     = 0.2;
 		se.explosion_1.volume = 0.2;
+
+		bgm.battle1 = this.sound.add("bgm1");
+		bgm.battle1.volume = 0.5;
+		bgm.battle1.play();
+
 
 		this.anims.create({
 			key: 'explode',
