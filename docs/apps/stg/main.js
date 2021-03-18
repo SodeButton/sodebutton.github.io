@@ -3,6 +3,8 @@
  * License : MIT License
  */
 "use strict";
+const game_width = 540;
+const game_height = 960;
 
 let isClick = false;
 let fadeTime = 0;
@@ -18,16 +20,16 @@ class LoadScene extends Phaser.Scene {
 		let progressBar = this.add.graphics();
 		let progressBox = this.add.graphics();
 		progressBox.fillStyle(0x222222, 0.8);
-		progressBox.fillRect(this.scale.width / 2 - 300, this.scale.height / 2 - 30, 600, 60);
+		progressBox.fillRect(game_width / 2 - 250, game_height / 2 - 30, 500, 60);
 
-		let text = this.add.text(this.scale.width / 2, this.scale.height / 5 * 3,"load", {fontSize: "50px", fontFamily:"pixelFont"});
+		let text = this.add.text(game_width / 2, game_height / 5 * 3,"load", {fontSize: "40px", fontFamily:"pixelFont"});
 		text.setOrigin(0.5, 0.5);
 
 		//ロードが進行したときの処理
 		this.load.on('progress', function (value) {
 			progressBar.clear();
 			progressBar.fillStyle(0xffffff, 1);
-			progressBar.fillRect(game.scale.width / 2 - 300, game.scale.height / 2 - 30, 600 * value, 60);
+			progressBar.fillRect(game.scale.width / 2 - 250, game.scale.height / 2 - 30, 500 * value, 60);
 		});
 
 		//ファイルのロードに入ったときの処理
@@ -46,6 +48,10 @@ class LoadScene extends Phaser.Scene {
 		this.load.image("enemy", "./Sprites/enemy.png");
 		this.load.image("heart", "./Sprites/heart.png");
 
+		this.load.spritesheet("enemy1", "./Sprites/enemiesA.png", {frameWidth: 32, frameHeight: 32, startFrame: 0, endFrame: 3});
+		this.load.spritesheet("enemy2", "./Sprites/enemiesA.png", {frameWidth: 32, frameHeight: 32, startFrame: 4, endFrame: 7});
+		this.load.spritesheet("enemy3", "./Sprites/enemiesA.png", {frameWidth: 32, frameHeight: 32, startFrame: 8, endFrame: 11});
+		this.load.spritesheet("enemy4", "./Sprites/enemiesA.png", {frameWidth: 32, frameHeight: 32, startFrame: 12, endFrame: 15});
 		this.load.spritesheet("player_bullet", "./Sprites/missile1.png", {frameWidth: 10, frameHeight: 16});
 		this.load.spritesheet("enemy_bullet", "./Sprites/missile2.png", {frameWidth: 10, frameHeight: 16});
 		this.load.spritesheet("explosion", "./Sprites/explosion.png", {frameWidth: 32, frameHeight: 32});
@@ -67,20 +73,20 @@ class StartScene extends Phaser.Scene {
 	}
 
 	create() {
-		title = this.add.text(400, 200, "ShootingGame", {fontSize: "100px", fontFamily:"pixelFont"});
+		title = this.add.text(game_width / 2, game_height / 4, "ShootingGame", {fontSize: "80px", fontFamily:"pixelFont"});
 		title.setOrigin(0.5, 0.5);
 
-		tapText = this.add.text(400, 1000, "Tap to Start", {fontSize: "40px", fontFamily:"pixelFont"});
+		tapText = this.add.text(game_width / 2, game_height * 0.7, "Tap to Start", {fontSize: "30px", fontFamily:"pixelFont"});
 		tapText.setOrigin(0.5, 0.5);
 
-		versionText = this.add.text(10, this.scale.height - 10, "Version：0.0.1", {fontSize: "30px", fontFamily: "pixelFont"});
+		versionText = this.add.text(10, game_height - 10, "Version：0.0.1", {fontSize: "30px", fontFamily: "pixelFont"});
 		versionText.setOrigin(0, 1);
 
-		copyrightText = this.add.text(this.scale.width - 10, this.scale.height - 10, "©2021 Button501", {fontSize: "30px", fontFamily: "pixelFont"});
+		copyrightText = this.add.text(game_width - 10, game_height - 10, "©2021 Button501", {fontSize: "30px", fontFamily: "pixelFont"});
 		copyrightText.setOrigin(1, 1);
 
 		fade = this.add.graphics();
-		fade.fillStyle(0x000000, 1).fillRect(0, 0, this.scale.width, this.scale.height);
+		fade.fillStyle(0x000000, 1).fillRect(0, 0, game_width, game_height);
 		fade.alpha = 0;
 		this.input.once('pointerup', function () {
 			this.tweens.add({
@@ -139,7 +145,7 @@ class GameScene extends Phaser.Scene {
 		player.hp = player.max_hp;
 		player.cool_time = 0;
 		for(let i = player.max_hp - 1; i >= 0; i--) {
-			heart[i] = this.add.image(this.scale.width - 64 * i - 32, 32, "heart");
+			heart[i] = this.add.image(game_width - 64 * i - 32, 32, "heart");
 			heart[i].scale = 2;
 		}
 
@@ -150,10 +156,9 @@ class GameScene extends Phaser.Scene {
 		se.shoot_4.volume     = 0.2;
 		se.explosion_1.volume = 0.2;
 
-		bgm.battle1 = this.sound.add("bgm1");
-		bgm.battle1.volume = 0.5;
+		bgm.battle1 = this.sound.add("bgm1", {loop:true});
+		bgm.battle1.volume = 0.3;
 		bgm.battle1.play();
-
 
 		this.anims.create({
 			key: 'explode',
@@ -204,15 +209,15 @@ class GameScene extends Phaser.Scene {
 			}
 
 			if(player.x < player.width / 2) player.x = player.width / 2;
-			if(player.x > 800 + player.width / 2) player.x = 800 - player.width / 2;
+			if(player.x > game_width + player.width / 2) player.x = game_width - player.width / 2;
 			if(player.y < player.height / 2) player.y = player.height / 2;
-			if(player.y > 1200 + player.height / 2) player.y = 1200 - player.height / 2;
+			if(player.y > game_height + player.height / 2) player.y = game_height - player.height / 2;
 		} else {
 			delta = 0;
-			let gameOverText = this.add.text(this.scale.width / 2, this.scale.height / 3, "GAME OVER", {color:"red", fontSize: "100px", fontFamily:"pixelFont"});
+			let gameOverText = this.add.text(game_width / 2, game_height / 3, "GAME OVER", {color:"red", fontSize: "100px", fontFamily:"pixelFont"});
 			gameOverText.setOrigin(0.5, 0.5);
 
-			let retryText = this.add.text(this.scale.width / 2, gameOverText.y + 200, "もう一度", {color:"green", fontSize: "50px", fontFamily:"pixelFont"});
+			let retryText = this.add.text(game_width / 2, gameOverText.y + 200, "もう一度", {color:"green", fontSize: "50px", fontFamily:"pixelFont"});
 			retryText.setOrigin(0.5, 0.5);
 
 		}
@@ -220,7 +225,8 @@ class GameScene extends Phaser.Scene {
 		this.spawnTime += delta / 1000;
 		if(this.spawnTime >= 2.0) {
 			this.spawnTime -= 2.0;
-			let enemy = this.add.sprite(Math.floor(Math.random() * 800), -32, "enemy");
+			this.spawnTime = -2.0;
+			let enemy = this.add.sprite(Math.floor(Math.random() * game_width - 64) + 32, -32, "enemy1");
 			enemy.dx = 0;
 			enemy.dy = 4;
 			enemy.timer = 0;
@@ -233,6 +239,12 @@ class GameScene extends Phaser.Scene {
 			if(enemy.active) {
 				enemy.x += enemy.dx * delta * 0.1;
 				enemy.y += enemy.dy * delta * 0.1;
+
+				let rad = Math.atan2( enemy.y - player.y, enemy.x - player.x);
+				let deg = rad * 180.0 / Math.PI;
+				enemy.angle = deg - 90;
+				enemy.bulletAngle[0] = deg - 90;
+
 				enemy.timer += delta / 1000;
 				if(enemy.timer >= 1.0) {
 					enemy.timer -= 1.0;
@@ -245,9 +257,8 @@ class GameScene extends Phaser.Scene {
 						enemy_bullets.push(bullet);
 						se.shoot_4.play();
 					}
-					//enemy.bulletAngle[0] += 1;
 				}
-				if(enemy.y > 1200 + enemy.height / 2) enemy.destroy();
+				if(enemy.y > game_height + enemy.height / 2) enemy.destroy();
 
 				if(player.active && player.cool_time <= 0) {
 					if (enemy.x - enemy.width  / 2 < player.x + player.width  / 2 && enemy.x + enemy.width  / 2 > player.x - player.width  / 2 &&
@@ -277,8 +288,8 @@ class GameScene extends Phaser.Scene {
 				bullet.x += bullet.dx * delta * 0.1;
 				bullet.y += bullet.dy * delta * 0.1;
 
-				if (bullet.y > 1200 + bullet.height / 2 || bullet.y < 0 - bullet.height / 2 ||
-					bullet.x > 800  + bullet.width  / 2 || bullet.x < 0 - bullet.width  / 2) bullet.destroy();
+				if (bullet.y > game_height + bullet.height / 2 || bullet.y < 0 - bullet.height / 2 ||
+					bullet.x > game_width  + bullet.width  / 2 || bullet.x < 0 - bullet.width  / 2) bullet.destroy();
 
 			} else {
 				player_bullets.some((v, i) => {
@@ -310,7 +321,8 @@ class GameScene extends Phaser.Scene {
 				bullet.x += bullet.dx * delta * 0.1;
 				bullet.y += bullet.dy * delta * 0.1;
 
-				if(bullet.y > 1200 + bullet.height / 2) bullet.destroy();
+				if (bullet.y > game_height + bullet.height / 2 || bullet.y < 0 - bullet.height / 2 ||
+					bullet.x > game_width  + bullet.width  / 2 || bullet.x < 0 - bullet.width  / 2) bullet.destroy();
 
 				if(player.active && player.cool_time <= 0) {
 					if (bullet.x - bullet.width  / 2 < player.x + player.width  / 2 && bullet.x + bullet.width  / 2 > player.x - player.width  / 2 &&
@@ -353,8 +365,8 @@ class GameScene extends Phaser.Scene {
 const config = {
 	type: Phaser.AUTO,
 	parent: 'canvas',
-	width: 800,
-	height: 1200,
+	width: 540,
+	height: 960,
 	scale: {
 		mode: Phaser.Scale.FIT,
 		autoCenter: Phaser.Scale.CENTER_HORIZONTALLY
