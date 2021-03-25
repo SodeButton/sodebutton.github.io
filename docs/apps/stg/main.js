@@ -156,7 +156,7 @@ class GameScene extends Phaser.Scene {
 		se.explosion_1.volume = 0.2;
 
 		bgm.battle1 = this.sound.add("bgm1", {loop:true});
-		bgm.battle1.volume = 0.3;
+		bgm.battle1.volume = 0.2;
 		bgm.battle1.play();
 
 		this.anims.create({
@@ -189,7 +189,6 @@ class GameScene extends Phaser.Scene {
 	}
 
 	update(time, delta) {
-
 		if(player.active) {
 			player.timer += delta / 1000;
 			if(player.cool_time > 0) {
