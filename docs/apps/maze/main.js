@@ -41,6 +41,35 @@ class GameScene extends Phaser.Scene {
             }
         }
 
+        for (let i = 2; i < maze_size - 2; i += 2) {
+            for (let j = 2; j < maze_size - 2; j += 2) {
+                let dx = 0,
+                    dy = 0;
+                do {
+                    let rand = Math.floor(Math.random() * 3);
+                    if (i === 2) rand = Math.floor(Math.random() * 4);
+                    switch (rand) {
+                        case 0:
+                            dx = 0;
+                            dy = 1;
+                            break;
+                        case 1:
+                            dx = 0;
+                            dy = -1;
+                            break;
+                        case 2:
+                            dx = 1;
+                            dy = 0;
+                            break;
+                        case 3:
+                            dx = -1;
+                            dy = 0;
+                            break;
+                    }
+                } while (maze[i + dx][j + dy] !== 0);
+                maze[i + dx][j + dy] = 1;
+            }
+        }
         this.draw();
     }
 
