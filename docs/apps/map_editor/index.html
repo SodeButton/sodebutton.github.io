@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="x-ua-compatible" content="IE=Edge" />
+    <meta
+        name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@Button501" />
+    <meta name="twitter:title" content="マップエディター" />
+    <meta name="twitter:description" content="マップ配列を簡単に作成できます。"/>
+    <meta
+        name="twitter:image"
+        content="https://sodebutton.github.io/img/favicon.png"
+    />
+    <link rel="icon" type="image/png" href="../../img/favicon.png" />
+    <title>迷路</title>
+    <style type="text/css" rel="preload">
+        body {
+            background-color: #333333;
+            color: white;
+        }
+        canvas {
+            background-color: white;
+        }
+
+    </style>
+<!--    <script src="//cdn.jsdelivr.net/npm/phaser@3.53.1/dist/phaser.js"></script>-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="./main.js"></script>
+</head>
+<body>
+
+<canvas id="main_canvas" width="640" height="640"></canvas>
+<canvas id="palette_canvas" width="0" height="0"></canvas>
+<div>
+    <p>
+        <label>map width</label>
+        <label>
+            <input type="number" id="map_width" value="640">
+        </label>
+    </p>
+    <p>
+        <label>map height</label>
+        <label>
+            <input type="number" id="map_height" value="640">
+        </label>
+    </p>
+    <p>
+        <label>map chip</label>
+        <label>
+            <input type="file" id="map_chip" accept=".png">
+        </label>
+    </p>
+    <p>
+        <label>frame width</label>
+        <label>
+            <input type="number" id="frame_width" value="32">
+        </label>
+    </p>
+    <p>
+        <label>frame height</label>
+        <label>
+            <input type="number" id="frame_height" value="32">
+        </label>
+    </p>
+</div>
+</body>
+</html>
