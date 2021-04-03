@@ -192,6 +192,7 @@ $(document).on("touchend", "#main_canvas", function () {
     isDragging = false;
 });
 $(document).on("touchmove", "#main_canvas", function (e) {
+    e.preventDefault();
     if (palette == null) return;
     let rect = e.target.getBoundingClientRect();
     let canvasX = Math.floor(
