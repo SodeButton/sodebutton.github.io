@@ -185,15 +185,13 @@ $(document).on("click", "#palette_canvas", function (e) {
 
 //マップチップの配置
 let isDragging = false;
-$(document).on("touchstart", "#main_canvas", function (e) {
-    e.preventDefault();
+$(document).on("touchstart", "#main_canvas", function () {
     isDragging = true;
 });
 $(document).on("touchend", "#main_canvas", function () {
     isDragging = false;
 });
 $(document).on("touchmove", "#main_canvas", function (e) {
-    e.preventDefault();
     if (palette == null) return;
     let rect = e.target.getBoundingClientRect();
     let canvasX = Math.floor(
