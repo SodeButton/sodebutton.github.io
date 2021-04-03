@@ -8,10 +8,18 @@ let map = [];
 let map_width = 640;
 let map_height = 640;
 let frame_size = 32;
-let palette = null;
 let palette_width;
 let palette_height;
 let select_frame = null;
+
+let palette = new Image();
+palette.src = "./Resources/sprites/default_chip.png";
+palette.onload = function () {
+    palette_width = palette.naturalWidth;
+    palette_height = palette.naturalHeight;
+    palette_update();
+    select_frame = null;
+};
 
 for (let i = 0; i < map_width / frame_size; i++)
     map[i] = new Array(map_height / frame_size).fill(-1);
