@@ -10,7 +10,7 @@ let map_height = 640;
 let frame_size = 32;
 let palette_width;
 let palette_height;
-let select_frame = null;
+let select_frame = 0;
 
 let palette = new Image();
 palette.src = "./Resources/sprites/default_chip.png";
@@ -18,7 +18,15 @@ palette.onload = function () {
     palette_width = palette.naturalWidth;
     palette_height = palette.naturalHeight;
     palette_update();
-    select_frame = null;
+    select_frame = 0;
+
+    let canvas = $("#palette_canvas");
+    let ctx = canvas[0].getContext("2d");
+
+    ctx.strokeStyle = "rgb(255,0,0,1)";
+    ctx.lineWidth = 6;
+
+    ctx.strokeRect(0, 0, frame_size, frame_size);
 };
 
 for (let i = 0; i < map_width / frame_size; i++)
@@ -53,6 +61,11 @@ $(document).on("change", "#map_chip", function () {
         palette_update();
         select_frame = null;
     };
+});
+
+$(document).on("click", "#eraser_btn", function () {
+    select_frame = -1;
+    palette_update();
 });
 
 $(document).on("change", "#auto_generation", function () {
@@ -162,6 +175,7 @@ $(document).on("click", "#palette_canvas", function (e) {
     palette_update();
 
     ctx.strokeStyle = "rgb(255,0,0,1)";
+    ctx.lineWidth = 6;
 
     let isSelect = false;
 
