@@ -195,12 +195,15 @@ $(document).on("touchmove", "#main_canvas", function (e) {
     if (palette == null) return;
     let rect = e.target.getBoundingClientRect();
     let canvasX = Math.floor(
-        (e.clientX - rect.left) / (this.clientWidth / this.width) / frame_size
+        (e.changedTouches[0].clientX - rect.left) /
+            (this.clientWidth / this.width) /
+            frame_size
     );
     let canvasY = Math.floor(
-        (e.clientY - rect.top) / (this.clientWidth / this.width) / frame_size
+        (e.changedTouches[0].clientY - rect.top) /
+            (this.clientWidth / this.width) /
+            frame_size
     );
-
     let isSelect = false;
 
     if (!isDragging) return;
