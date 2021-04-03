@@ -254,6 +254,61 @@ $(document).on("mousemove", "#main_canvas", function (e) {
     drawMap();
 });
 
+$(document).on("click", "#output_btn", function () {
+    let link, blob;
+    switch ($("#output_format").val()) {
+        case "json file":
+            blob = new Blob([JSON.stringify(map, null, "\t")], {
+                type: "json",
+            });
+            link = document.createElement("a");
+            link.href = window.URL.createObjectURL(blob);
+            link.download = "map.json";
+            link.click();
+            break;
+        case "text":
+            $("#output_text").text(JSON.stringify(map, null, "\t"));
+            break;
+        case "image":
+            let canvas = $("#main_canvas");
+            let ctx = canvas[0].getContext("2d");
+
+            ctx.clearRect(0, 0, map_width, map_height);
+
+            if (frame_size <= 0) return false;
+
+            for (let i = 0; i < map_width / frame_size; i++) {
+                for (let j = 0; j < map_height / frame_size; j++) {
+                    if (map[i][j] >= 0) {
+                        let y = Math.floor(
+                            map[i][j] / (palette_width / frame_size)
+                        );
+                        let x = Math.floor(
+                            map[i][j] - (palette_width / frame_size) * y
+                        );
+                        ctx.drawImage(
+                            palette,
+                            x * frame_size,
+                            y * frame_size,
+                            frame_size,
+                            frame_size,
+                            i * frame_size,
+                            j * frame_size,
+                            frame_size,
+                            frame_size
+                        );
+                    }
+                }
+            }
+            link = document.createElement("a");
+            link.href = canvas[0].toDataURL();
+            link.download = "map.png";
+            link.click();
+            drawMap();
+            break;
+    }
+});
+
 function canvas_update() {
     let canvas = $("#main_canvas");
     let ctx = canvas[0].getContext("2d");
