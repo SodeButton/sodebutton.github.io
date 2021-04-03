@@ -185,7 +185,8 @@ $(document).on("click", "#palette_canvas", function (e) {
 
 //マップチップの配置
 let isDragging = false;
-$(document).on("touchstart", "#main_canvas", function () {
+$(document).on("touchstart", "#main_canvas", function (e) {
+    e.preventDefault();
     isDragging = true;
 });
 $(document).on("touchend", "#main_canvas", function () {
