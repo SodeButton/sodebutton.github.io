@@ -11,6 +11,7 @@ let frame_size = 32;
 let palette = null;
 let palette_width;
 let palette_height;
+let select_frame = null;
 
 for (let i = 0; i < map_width / frame_size; i++)
     map[i] = new Array(map_height / frame_size).fill(-1);
@@ -42,6 +43,7 @@ $(document).on("change", "#map_chip", function () {
         palette_width = palette.naturalWidth;
         palette_height = palette.naturalHeight;
         palette_update();
+        select_frame = null;
     };
 });
 
@@ -135,6 +137,80 @@ $(document).on("click", "#generate_btn", function () {
     }
 });
 
+//マップチップの選択
+$(document).on("click", "#palette_canvas", function (e) {
+    let rect = e.target.getBoundingClientRect();
+    let canvasX = Math.floor(
+        (e.clientX - rect.left) / (this.clientWidth / this.width) / frame_size
+    );
+    let canvasY = Math.floor(
+        (e.clientY - rect.top) / (this.clientWidth / this.width) / frame_size
+    );
+    console.log(canvasX, canvasY);
+
+    let canvas = $("#palette_canvas");
+    let ctx = canvas[0].getContext("2d");
+
+    palette_update();
+
+    ctx.strokeStyle = "rgb(255,0,0,1)";
+
+    let isSelect = false;
+
+    for (let i = 0; i < palette_width / frame_size; i++) {
+        for (let j = 0; j < palette_height / frame_size; j++) {
+            if (canvasX === i && canvasY === j) {
+                isSelect = true;
+                ctx.strokeRect(
+                    i * frame_size,
+                    j * frame_size,
+                    frame_size,
+                    frame_size
+                );
+                select_frame = i + j * (palette_width / frame_size);
+                break;
+            }
+        }
+        if (isSelect) break;
+    }
+});
+
+//マップチップの配置
+let isDragging = false;
+
+$(document).on("mousedown", "#main_canvas", function () {
+    isDragging = true;
+});
+$(document).on("mouseup", "#main_canvas", function () {
+    isDragging = false;
+});
+$(document).on("mousemove", "#main_canvas", function (e) {
+    if (palette == null) return;
+    let rect = e.target.getBoundingClientRect();
+    let canvasX = Math.floor(
+        (e.clientX - rect.left) / (this.clientWidth / this.width) / frame_size
+    );
+    let canvasY = Math.floor(
+        (e.clientY - rect.top) / (this.clientWidth / this.width) / frame_size
+    );
+
+    let isSelect = false;
+
+    if (!isDragging) return;
+
+    for (let i = 0; i < map_width / frame_size; i++) {
+        for (let j = 0; j < map_height / frame_size; j++) {
+            if (canvasX === i && canvasY === j) {
+                isSelect = true;
+                map[i][j] = select_frame;
+                break;
+            }
+        }
+        if (isSelect) break;
+    }
+    drawMap();
+});
+
 function canvas_update() {
     let canvas = $("#main_canvas");
     let ctx = canvas[0].getContext("2d");
@@ -158,6 +234,10 @@ function canvas_update() {
         ctx.closePath();
         ctx.stroke();
     }
+    map = new Array(map_width / frame_size);
+    for (let i = 0; i < map_width / frame_size; i++)
+        map[i] = new Array(map_height / frame_size).fill(-1);
+
     return true;
 }
 
