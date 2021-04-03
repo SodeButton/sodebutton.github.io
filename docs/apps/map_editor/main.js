@@ -185,6 +185,38 @@ $(document).on("click", "#palette_canvas", function (e) {
 
 //マップチップの配置
 let isDragging = false;
+$(document).on("touchstart", "#main_canvas", function () {
+    isDragging = true;
+});
+$(document).on("touchend", "#main_canvas", function () {
+    isDragging = false;
+});
+$(document).on("touchmove", "#main_canvas", function (e) {
+    if (palette == null) return;
+    let rect = e.target.getBoundingClientRect();
+    let canvasX = Math.floor(
+        (e.clientX - rect.left) / (this.clientWidth / this.width) / frame_size
+    );
+    let canvasY = Math.floor(
+        (e.clientY - rect.top) / (this.clientWidth / this.width) / frame_size
+    );
+
+    let isSelect = false;
+
+    if (!isDragging) return;
+
+    for (let i = 0; i < map_width / frame_size; i++) {
+        for (let j = 0; j < map_height / frame_size; j++) {
+            if (canvasX === i && canvasY === j) {
+                isSelect = true;
+                map[i][j] = select_frame;
+                break;
+            }
+        }
+        if (isSelect) break;
+    }
+    drawMap();
+});
 
 $(document).on("mousedown", "#main_canvas", function () {
     isDragging = true;
