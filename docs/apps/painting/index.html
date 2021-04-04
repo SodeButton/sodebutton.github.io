@@ -7,6 +7,10 @@
         body {
             background-color: #333333;
         }
+        #main_canvas {
+            width: min(90vw, 90vh);
+            height: min(90vw, 90vh);
+        }
     </style>
     <script
         src="https://kit.fontawesome.com/aef5adb27d.js"
@@ -16,11 +20,48 @@
 </head>
 <body>
 <div>
-    <canvas id="main" width="640" height="640" style="background-color: white"></canvas>
+    <canvas id="main_canvas" width="720" height="720" style="background-color: white"></canvas>
 </div>
 
 <script>
-    $(document).on("touchstart", "")
+    let isDragging = false;
+    $(document).on("touchstart", "#main_canvas", function() {
+        isDragging = true;
+    });
+    $(document).on("touchend", "#main_canvas", function() {
+        isDragging = false;
+    });
+    $(document).on("touchmove", "#main_canvas", function(e) {
+        if(isDragging) {
+            let canvas = $("#main_canvas");
+            let ctx = canvas[0].getContext("2d");
+            let rect = e.target.getBoundingClientRect();
+            x = (e.changedTouches[0].clientX - rect.left) / (this.clientWidth / this.width);
+            y = (e.changedTouches[0].clientY - rect.top) / (this.clientWidth / this.width);
+            ctx.beginPath();
+            ctx.arc(x, y, 2, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    });
+
+    $(document).on("mousedown", "#main_canvas", function() {
+        isDragging = true;
+    });
+    $(document).on("mouseup", "#main_canvas", function() {
+        isDragging = false;
+    });
+    $(document).on("mousemove", "#main_canvas", function(e) {
+        if(isDragging) {
+            let canvas = $("#main_canvas");
+            let ctx = canvas[0].getContext("2d");
+            let rect = e.target.getBoundingClientRect();
+            x = (e.clientX - rect.left) / (this.clientWidth / this.width);
+            y = (e.clientY - rect.top) / (this.clientWidth / this.width);
+            ctx.beginPath();
+            ctx.arc(x, y, 2, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    });
 </script>
 </body>
 </html>
