@@ -54,11 +54,16 @@ $(document).on("change", "#frame_size", function () {
 
 $(document).on("change", "#map_chip", function () {
     palette = new Image();
-    palette.src = window.URL.createObjectURL(this.files[0]);
+    if (this.files[0] === undefined) {
+        palette.src = "./Resources/sprites/default_chip.png";
+    } else {
+        palette.src = window.URL.createObjectURL(this.files[0]);
+    }
     palette.onload = function () {
         palette_width = palette.naturalWidth;
         palette_height = palette.naturalHeight;
         palette_update();
+        drawMap();
         select_frame = null;
     };
 });
@@ -266,6 +271,23 @@ $(document).on("mousemove", "#main_canvas", function (e) {
         if (isSelect) break;
     }
     drawMap();
+});
+
+$(document).on("click", "#upload_btn", function () {
+    let link = document.createElement("input");
+    link.type = "file";
+    link.accept = "application/json";
+    link.click();
+    link.addEventListener("change", function () {
+        let load_map;
+        link.files[0].text().then(function (result) {
+            load_map = JSON.parse(result);
+            map = [];
+            map = load_map;
+            drawMap();
+            console.log(load_map);
+        });
+    });
 });
 
 $(document).on("click", "#output_btn", function () {
