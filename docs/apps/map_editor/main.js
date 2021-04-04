@@ -456,5 +456,28 @@ function drawMap() {
 }
 
 window.onload = function () {
+    let url = new URL(window.location.href);
+    let params = url.searchParams;
+    let map_data = params.get("map_data");
+    let width = params.get("width");
+    let height = params.get("height");
+    let size = params.get("size");
     canvas_update();
+    if (
+        map_data != null &&
+        width != null &&
+        height != null &&
+        size != null &&
+        Number(size) > 0
+    ) {
+        map = [];
+        map = JSON.parse(map_data);
+        map_width = Number(width);
+        map_height = Number(height);
+        frame_size = Number(size);
+        $("#main_canvas").attr("width", width).attr("height", height);
+        canvas_update();
+        drawMap();
+        console.log(map_data);
+    }
 };
