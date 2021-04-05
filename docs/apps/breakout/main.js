@@ -79,8 +79,8 @@ function create() {
 	ball.speed = 4;
 
 	let deg = Math.random() * 120 + 30;
-	ball.dx = Math.cos(deg * Math.PI / 360);
-	ball.dy = -Math.sin(deg * Math.PI / 360);
+	ball.dx = Math.cos((deg * Math.PI) / 360);
+	ball.dy = -Math.sin((deg * Math.PI) / 360);
 
 	reflect = this.sound.add("reflect");
 	for (let i = 1; i < 9; i++) {
@@ -95,7 +95,6 @@ function create() {
 }
 
 function update() {
-
 	ball.speed = Math.min(hit_count + 4, 20);
 	ball.x += ball.dx * ball.speed;
 	ball.y += ball.dy * ball.speed;
@@ -119,11 +118,16 @@ function update() {
 	for (let i = 0; i < 10; i++) {
 		for (let j = 0; j < 6; j++) {
 			if (blocks[i][j] != null) {
-				if (ball.x + 16 > blocks[i][j].x - 40 && ball.x - 16 < blocks[i][j].x + 40) {
-
-					if (ball.y + 16 >= blocks[i][j].y - 16 && ball.y + 16 <= blocks[i][j].y ||
-						ball.y - 16 <= blocks[i][j].y + 16 && ball.y - 16 >= blocks[i][j].y) {
-
+				if (
+					ball.x + 16 > blocks[i][j].x - 40 &&
+					ball.x - 16 < blocks[i][j].x + 40
+				) {
+					if (
+						(ball.y + 16 >= blocks[i][j].y - 16 &&
+							ball.y + 16 <= blocks[i][j].y) ||
+						(ball.y - 16 <= blocks[i][j].y + 16 &&
+							ball.y - 16 >= blocks[i][j].y)
+					) {
 						ball.dy *= -1;
 						blocks[i][j].destroy();
 						blocks[i][j] = null;
@@ -131,11 +135,16 @@ function update() {
 						is_break = true;
 						break;
 					}
-				} else if (ball.y + 16 > blocks[i][j].y - 16 && ball.y - 16 < blocks[i][j].y + 16) {
-
-					if (ball.x + 16 >= blocks[i][j].x - 40 && ball.x + 16 <= blocks[i][j].x ||
-						ball.x - 16 <= blocks[i][j].x + 40 && ball.x - 16 >= blocks[i][j].x) {
-
+				} else if (
+					ball.y + 16 > blocks[i][j].y - 16 &&
+					ball.y - 16 < blocks[i][j].y + 16
+				) {
+					if (
+						(ball.x + 16 >= blocks[i][j].x - 40 &&
+							ball.x + 16 <= blocks[i][j].x) ||
+						(ball.x - 16 <= blocks[i][j].x + 40 &&
+							ball.x - 16 >= blocks[i][j].x)
+					) {
 						ball.dx *= -1;
 						blocks[i][j].destroy();
 						blocks[i][j] = null;
@@ -149,11 +158,15 @@ function update() {
 		if (is_break) break;
 	}
 
-	if (ball.x + 16 > bar.x - 64 && ball.x - 16 < bar.x + 64 && ball.y + 16 > bar.y - 16) {
+	if (
+		ball.x + 16 > bar.x - 64 &&
+		ball.x - 16 < bar.x + 64 &&
+		ball.y + 16 > bar.y - 16
+	) {
 		if (!is_hit) {
 			let deg = Math.random() * 120 + 30;
-			ball.dx = Math.cos(deg * Math.PI / 360.0);
-			ball.dy = -Math.sin(deg * Math.PI / 360.0);
+			ball.dx = Math.cos((deg * Math.PI) / 360.0);
+			ball.dy = -Math.sin((deg * Math.PI) / 360.0);
 			reflect.play();
 			is_hit = true;
 			hit_count++;
@@ -167,7 +180,8 @@ function update() {
 		bar.x = pointer.x;
 
 		if (bar.x < bar.width / 2) bar.x = bar.width / 2;
-		if (bar.x > this.scale.width - (bar.width / 2)) bar.x = this.scale.width - (bar.width / 2);
+		if (bar.x > this.scale.width - bar.width / 2)
+			bar.x = this.scale.width - bar.width / 2;
 	}
 
 	if (ball.y > this.scale.height + ball.height / 2) {
