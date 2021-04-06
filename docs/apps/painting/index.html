@@ -34,42 +34,62 @@
 </div>
 
 <script>
+	let old_position = {};
+	let new_position = {};
 	let isDragging = false;
-	$(document).on("touchstart", "#main_canvas", function() {
+	$(document).on("touchstart", "#main_canvas", function(e) {
 		isDragging = true;
+		let rect = e.target.getBoundingClientRect();
+		x = (e.changedTouches[0].clientX - rect.left) / (this.clientWidth / this.width);
+		y = (e.changedTouches[0].clientY - rect.top) / (this.clientWidth / this.width);
+		new_position = { x: x, y: y };
 	});
 	$(document).on("touchend", "#main_canvas", function() {
 		isDragging = false;
 	});
 	$(document).on("touchmove", "#main_canvas", function(e) {
 		if (isDragging) {
+			old_position = new_position;
 			let canvas = $("#main_canvas");
 			let ctx = canvas[0].getContext("2d");
 			let rect = e.target.getBoundingClientRect();
 			x = (e.changedTouches[0].clientX - rect.left) / (this.clientWidth / this.width);
 			y = (e.changedTouches[0].clientY - rect.top) / (this.clientWidth / this.width);
+			new_position = { x: x, y: y };
 			ctx.beginPath();
-			ctx.arc(x, y, 2, 0, Math.PI * 2);
-			ctx.fill();
+			ctx.strokeStyle = "#000000";
+			ctx.lineWidth = 10;
+			ctx.moveTo(old_position.x, old_position.y);
+			ctx.lineTo(new_position.x, new_position.y);
+			ctx.stroke();
 		}
 	});
 
-	$(document).on("mousedown", "#main_canvas", function() {
+	$(document).on("mousedown", "#main_canvas", function(e) {
 		isDragging = true;
+		let rect = e.target.getBoundingClientRect();
+		x = (e.changedTouches[0].clientX - rect.left) / (this.clientWidth / this.width);
+		y = (e.changedTouches[0].clientY - rect.top) / (this.clientWidth / this.width);
+		new_position = { x: x, y: y };
 	});
 	$(document).on("mouseup", "#main_canvas", function() {
 		isDragging = false;
 	});
 	$(document).on("mousemove", "#main_canvas", function(e) {
 		if (isDragging) {
+			old_position = new_position;
 			let canvas = $("#main_canvas");
 			let ctx = canvas[0].getContext("2d");
 			let rect = e.target.getBoundingClientRect();
 			x = (e.clientX - rect.left) / (this.clientWidth / this.width);
 			y = (e.clientY - rect.top) / (this.clientWidth / this.width);
+			new_position = { x: x, y: y };
 			ctx.beginPath();
-			ctx.arc(x, y, 2, 0, Math.PI * 2);
-			ctx.fill();
+			ctx.strokeStyle = "#000000";
+			ctx.lineWidth = 10;
+			ctx.moveTo(old_position.x, old_position.y);
+			ctx.lineTo(new_position.x, new_position.y);
+			ctx.stroke();
 		}
 	});
 </script>
