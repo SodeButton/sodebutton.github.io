@@ -28,10 +28,39 @@
             color: white;
         }
 
+        #main_box {
+            display: flex;
+        }
+
+        #paint_box {
+            margin: 10px;
+        }
+
+        #paint_box label {
+            display: table-cell;
+            font-size: 16px;
+            border-radius: 5px;
+            border: white solid 3px;
+            padding: 5px;
+        }
+
+        #paint_box input {
+            display: none;
+        }
+
+        #paint_box label:checked {
+            background-color: dodgerblue;
+        }
+
+        #palette_canvas {
+            display: block;
+            width: 100%;
+            margin: 5px 0;
+        }
+
         canvas {
             background-color: white;
         }
-
     </style>
     <script
         src="https://kit.fontawesome.com/aef5adb27d.js"
@@ -41,12 +70,18 @@
     <script src="./main.js"></script>
 </head>
 <body>
-
-<canvas id="main_canvas" width="640" height="640"></canvas>
-<canvas id="palette_canvas" width="0" height="0"></canvas>
-<button id="pen_btn"><i class="fas fa-pen"></i></button>
-<button id="eraser_btn"><i class="fas fa-eraser"></i></button>
-<button id="upload_btn"><i class="fas fa-upload"></i></button>
+<div id="main_box">
+    <canvas id="main_canvas" width="640" height="640"></canvas>
+    <div id="paint_box">
+        <input type="checkbox" id="pen_btn">
+        <label for="pen_btn"><i class="fas fa-pen"></i></label>
+        <input type="checkbox" id="eraser_btn">
+        <label for="eraser_btn"><i class="fas fa-eraser"></i></label>
+        <input type="checkbox" id="upload_btn">
+        <label for="upload_btn"><i class="fas fa-upload"></i></label>
+        <canvas id="palette_canvas" width="0" height="0"></canvas>
+    </div>
+</div>
 <div>
     <p>
         <label>map width</label>

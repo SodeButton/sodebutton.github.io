@@ -19,26 +19,16 @@ class LoadScene extends Phaser.Scene {
 		let progressBar = this.add.graphics();
 		let progressBox = this.add.graphics();
 		progressBox.fillStyle(0x222222, 0.8);
-		progressBox.fillRect(
-			game_width / 2 - 250,
-			game_height / 2 - 30,
-			500,
-			60
-		);
+		progressBox.fillRect(game_width / 2 - 250, game_height / 2 - 30, 500, 60);
 
-		let text = this.add.text(
-			game_width / 2,
-			(game_height / 5) * 3,
-			"load",
-			{
-				fontSize: "40px",
-				fontFamily: "pixelFont"
-			}
-		);
+		let text = this.add.text(game_width / 2, (game_height / 5) * 3, "load", {
+			fontSize: "40px",
+			fontFamily: "pixelFont",
+		});
 		text.setOrigin(0.5, 0.5);
 
 		//ロードが進行したときの処理
-		this.load.on("progress", function(value) {
+		this.load.on("progress", function (value) {
 			progressBar.clear();
 			progressBar.fillStyle(0xffffff, 1);
 			progressBar.fillRect(
@@ -50,12 +40,12 @@ class LoadScene extends Phaser.Scene {
 		});
 
 		//ファイルのロードに入ったときの処理
-		this.load.on("fileprogress", function(file) {
+		this.load.on("fileprogress", function (file) {
 			text.text = file.key;
 		});
 
 		//すべてのロードが完了したときの処理
-		this.load.on("complete", function() {
+		this.load.on("complete", function () {
 			text.text = "complete";
 		});
 		this.load.setPath("./Resources/");
@@ -68,19 +58,19 @@ class LoadScene extends Phaser.Scene {
 			frameWidth: 32,
 			frameHeight: 32,
 			startFrame: 0,
-			endFrame: 19
+			endFrame: 19,
 		});
 		this.load.spritesheet("player_bullet", "./Sprites/missile1.png", {
 			frameWidth: 10,
-			frameHeight: 16
+			frameHeight: 16,
 		});
 		this.load.spritesheet("enemy_bullet", "./Sprites/missile2.png", {
 			frameWidth: 10,
-			frameHeight: 16
+			frameHeight: 16,
 		});
 		this.load.spritesheet("explosion", "./Sprites/explosion.png", {
 			frameWidth: 32,
-			frameHeight: 32
+			frameHeight: 32,
 		});
 
 		this.load.audio("shoot1", "./Audios/Shoot1.wav");
@@ -104,36 +94,26 @@ class StartScene extends Phaser.Scene {
 	create() {
 		title = this.add.text(game_width / 2, game_height / 4, "ShootingGame", {
 			fontSize: "80px",
-			fontFamily: "pixelFont"
+			fontFamily: "pixelFont",
 		});
 		title.setOrigin(0.5, 0.5);
 
-		tapText = this.add.text(
-			game_width / 2,
-			game_height * 0.7,
-			"Tap to Start",
-			{
-				fontSize: "30px",
-				fontFamily: "pixelFont"
-			}
-		);
+		tapText = this.add.text(game_width / 2, game_height * 0.7, "Tap to Start", {
+			fontSize: "30px",
+			fontFamily: "pixelFont",
+		});
 		tapText.setOrigin(0.5, 0.5);
 
 		versionText = this.add.text(10, game_height - 10, "Version：0.0.1", {
 			fontSize: "30px",
-			fontFamily: "pixelFont"
+			fontFamily: "pixelFont",
 		});
 		versionText.setOrigin(0, 1);
 
-		copyrightText = this.add.text(
-			game_width - 10,
-			game_height - 10,
-			"©2021 Button501",
-			{
-				fontSize: "30px",
-				fontFamily: "pixelFont"
-			}
-		);
+		copyrightText = this.add.text(game_width - 10, game_height - 10, "©2021 Button501", {
+			fontSize: "30px",
+			fontFamily: "pixelFont",
+		});
 		copyrightText.setOrigin(1, 1);
 
 		fade = this.add.graphics();
@@ -141,13 +121,13 @@ class StartScene extends Phaser.Scene {
 		fade.alpha = 0;
 		this.input.once(
 			"pointerdown",
-			function() {
+			function () {
 				this.tweens.add(
 					{
 						targets: fade,
 						alpha: 1,
 						duration: 1000,
-						ease: "Power2"
+						ease: "Power2",
 					},
 					this
 				);
@@ -225,42 +205,42 @@ class GameScene extends Phaser.Scene {
 			key: "explode",
 			frames: this.anims.generateFrameNumbers("explosion", {
 				start: 0,
-				end: 4
+				end: 4,
 			}),
 			frameRate: 10,
-			repeat: 0
+			repeat: 0,
 		});
 		this.anims.create({
 			key: "enemy1_shoot",
 			frames: this.anims.generateFrameNumbers("enemyA", {
 				start: 5,
-				end: 9
+				end: 9,
 			}),
 			frameRate: 10,
-			repeat: 0
+			repeat: 0,
 		});
 		this.anims.create({
 			key: "enemy2_shoot",
 			frames: this.anims.generateFrameNumbers("enemyA", {
 				start: 10,
-				end: 14
+				end: 14,
 			}),
 			frameRate: 10,
-			repeat: 0
+			repeat: 0,
 		});
 		this.anims.create({
 			key: "enemy3_shoot",
 			frames: this.anims.generateFrameNumbers("enemyA", {
 				start: 15,
-				end: 19
+				end: 19,
 			}),
 			frameRate: 10,
-			repeat: 0
+			repeat: 0,
 		});
 
 		score_text = this.add.text(10, 10, "SCORE：" + this.score, {
 			fontSize: "40px",
-			fontFamily: "pixelFont"
+			fontFamily: "pixelFont",
 		});
 		score_text.updateText();
 	}
@@ -274,18 +254,12 @@ class GameScene extends Phaser.Scene {
 					player.cool_time = 0;
 					player.alpha = 1;
 				} else {
-					player.alpha = Math.sin(
-						(player.cool_time * 90 * 15 * Math.PI) / 180.0
-					);
+					player.alpha = Math.sin((player.cool_time * 90 * 15 * Math.PI) / 180.0);
 				}
 			}
 			if (player.timer >= 0.1) {
 				player.timer -= 0.1;
-				let bullet = this.add.sprite(
-					player.x,
-					player.y,
-					"player_bullet"
-				);
+				let bullet = this.add.sprite(player.x, player.y, "player_bullet");
 				bullet.dx = 0;
 				bullet.dy = -10;
 				bullet.angle = 180;
@@ -308,36 +282,25 @@ class GameScene extends Phaser.Scene {
 			}
 
 			if (player.x < player.width / 2) player.x = player.width / 2;
-			if (player.x > game_width + player.width / 2)
-				player.x = game_width - player.width / 2;
+			if (player.x > game_width + player.width / 2) player.x = game_width - player.width / 2;
 			if (player.y < player.height / 2) player.y = player.height / 2;
 			if (player.y > game_height + player.height / 2)
 				player.y = game_height - player.height / 2;
 		} else {
 			delta = 0;
 			if (!is_gameover) {
-				let gameOverText = this.add.text(
-					game_width / 2,
-					game_height / 3,
-					"GAME OVER",
-					{
-						color: "red",
-						fontSize: "100px",
-						fontFamily: "pixelFont"
-					}
-				);
+				let gameOverText = this.add.text(game_width / 2, game_height / 3, "GAME OVER", {
+					color: "red",
+					fontSize: "100px",
+					fontFamily: "pixelFont",
+				});
 				gameOverText.setOrigin(0.5, 0.5);
 
-				let retryButton = this.add.text(
-					game_width / 2,
-					gameOverText.y + 400,
-					"Continue",
-					{
-						color: "green",
-						fontSize: "50px",
-						fontFamily: "pixelFont"
-					}
-				);
+				let retryButton = this.add.text(game_width / 2, gameOverText.y + 400, "Continue", {
+					color: "green",
+					fontSize: "50px",
+					fontFamily: "pixelFont",
+				});
 
 				retryButton.setOrigin(0.5, 0.5);
 				retryButton.setInteractive();
@@ -350,16 +313,11 @@ class GameScene extends Phaser.Scene {
 					this
 				);
 
-				let tweetButton = this.add.text(
-					game_width / 2,
-					retryButton.y + 100,
-					"Tweet",
-					{
-						color: "royalblue",
-						fontSize: "50px",
-						fontFamily: "pixelFont"
-					}
-				);
+				let tweetButton = this.add.text(game_width / 2, retryButton.y + 100, "Tweet", {
+					color: "royalblue",
+					fontSize: "50px",
+					fontFamily: "pixelFont",
+				});
 
 				tweetButton.setOrigin(0.5, 0.5);
 				tweetButton.setInteractive();
@@ -414,21 +372,9 @@ class GameScene extends Phaser.Scene {
 					enemy.anims.play("enemy1_shoot", true);
 
 					for (let i = 0; i < 360; i += 120) {
-						let bullet = this.add.sprite(
-							enemy.x,
-							enemy.y,
-							"enemy_bullet"
-						);
-						bullet.dx =
-							6 *
-							Math.cos(
-								((enemy.bulletAngle[0] + i) * Math.PI) / 180.0
-							);
-						bullet.dy =
-							6 *
-							Math.sin(
-								((enemy.bulletAngle[0] + i) * Math.PI) / 180.0
-							);
+						let bullet = this.add.sprite(enemy.x, enemy.y, "enemy_bullet");
+						bullet.dx = 6 * Math.cos(((enemy.bulletAngle[0] + i) * Math.PI) / 180.0);
+						bullet.dy = 6 * Math.sin(((enemy.bulletAngle[0] + i) * Math.PI) / 180.0);
 						bullet.angle = enemy.bulletAngle[0] + i - 90;
 						enemy_bullets.push(bullet);
 						se.shoot_4.play();
@@ -438,14 +384,10 @@ class GameScene extends Phaser.Scene {
 
 				if (player.active && player.cool_time <= 0) {
 					if (
-						enemy.x - enemy.width / 2 <
-						player.x + player.width / 2 &&
-						enemy.x + enemy.width / 2 >
-						player.x - player.width / 2 &&
-						enemy.y - enemy.height / 2 <
-						player.y + player.height / 2 &&
-						enemy.y + enemy.height / 2 >
-						player.y - player.height / 2
+						enemy.x - enemy.width / 2 < player.x + player.width / 2 &&
+						enemy.x + enemy.width / 2 > player.x - player.width / 2 &&
+						enemy.y - enemy.height / 2 < player.y + player.height / 2 &&
+						enemy.y + enemy.height / 2 > player.y - player.height / 2
 					) {
 						enemy.destroy();
 						player.hp--;
@@ -454,11 +396,7 @@ class GameScene extends Phaser.Scene {
 						player.cool_time = 1.0;
 						se.explosion_1.play();
 
-						let effect = this.add.sprite(
-							enemy.x,
-							enemy.y,
-							"explosion"
-						);
+						let effect = this.add.sprite(enemy.x, enemy.y, "explosion");
 						effect.anims.play("explode", true);
 						effect.endTime = 0.6;
 						explosions.push(effect);
@@ -492,25 +430,17 @@ class GameScene extends Phaser.Scene {
 			for (let enemy of enemies) {
 				if (enemy.active) {
 					if (
-						bullet.x - bullet.width / 2 <
-						enemy.x + enemy.width / 2 &&
-						bullet.x + bullet.width / 2 >
-						enemy.x - enemy.width / 2 &&
-						bullet.y - bullet.height / 2 <
-						enemy.y + enemy.height / 2 &&
-						bullet.y + bullet.height / 2 >
-						enemy.y - enemy.height / 2
+						bullet.x - bullet.width / 2 < enemy.x + enemy.width / 2 &&
+						bullet.x + bullet.width / 2 > enemy.x - enemy.width / 2 &&
+						bullet.y - bullet.height / 2 < enemy.y + enemy.height / 2 &&
+						bullet.y + bullet.height / 2 > enemy.y - enemy.height / 2
 					) {
 						bullet.destroy();
 						enemy.destroy();
 						this.score += 100;
 						score_text.text = "SCORE：" + this.score;
 						se.explosion_1.play();
-						let effect = this.add.sprite(
-							enemy.x,
-							enemy.y,
-							"explosion"
-						);
+						let effect = this.add.sprite(enemy.x, enemy.y, "explosion");
 						effect.anims.play("explode", true);
 						effect.endTime = 0.6;
 						explosions.push(effect);
@@ -535,14 +465,10 @@ class GameScene extends Phaser.Scene {
 
 				if (player.active && player.cool_time <= 0) {
 					if (
-						bullet.x - bullet.width / 2 <
-						player.x + player.width / 2 &&
-						bullet.x + bullet.width / 2 >
-						player.x - player.width / 2 &&
-						bullet.y - bullet.height / 2 <
-						player.y + player.height / 2 &&
-						bullet.y + bullet.height / 2 >
-						player.y - player.height / 2
+						bullet.x - bullet.width / 2 < player.x + player.width / 2 &&
+						bullet.x + bullet.width / 2 > player.x - player.width / 2 &&
+						bullet.y - bullet.height / 2 < player.y + player.height / 2 &&
+						bullet.y + bullet.height / 2 > player.y - player.height / 2
 					) {
 						bullet.destroy();
 						player.hp--;
@@ -550,11 +476,7 @@ class GameScene extends Phaser.Scene {
 						if (player.hp <= 0) player.destroy();
 						player.cool_time = 1.0;
 						se.explosion_1.play();
-						let effect = this.add.sprite(
-							player.x,
-							player.y,
-							"explosion"
-						);
+						let effect = this.add.sprite(player.x, player.y, "explosion");
 						effect.anims.play("explode", true);
 						effect.endTime = 0.6;
 						explosions.push(effect);
@@ -589,16 +511,16 @@ const config = {
 	height: 960,
 	scale: {
 		mode: Phaser.Scale.FIT,
-		autoCenter: Phaser.Scale.CENTER_HORIZONTALLY
+		autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
 	},
 	pixelArt: true,
 	physics: {
 		default: "arcade",
 		arcade: {
-			gravity: { y: 0 }
-		}
+			gravity: { y: 0 },
+		},
 	},
-	scene: [LoadScene, StartScene, GameScene]
+	scene: [LoadScene, StartScene, GameScene],
 };
 
 const game = new Phaser.Game(config);

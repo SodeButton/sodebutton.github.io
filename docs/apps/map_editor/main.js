@@ -14,7 +14,7 @@ let select_frame = 0;
 
 let palette = new Image();
 palette.src = "./Resources/sprites/default_chip.png";
-palette.onload = function() {
+palette.onload = function () {
 	palette_width = palette.naturalWidth;
 	palette_height = palette.naturalHeight;
 	palette_update();
@@ -32,19 +32,19 @@ palette.onload = function() {
 for (let i = 0; i < map_width / frame_size; i++)
 	map[i] = new Array(map_height / frame_size).fill(-1);
 
-$(document).on("change", "#map_width", function() {
+$(document).on("change", "#map_width", function () {
 	$("#main_canvas").attr("width", "" + this.value);
 	map_width = Number(this.value);
 	canvas_update();
 });
 
-$(document).on("change", "#map_height", function() {
+$(document).on("change", "#map_height", function () {
 	$("#main_canvas").attr("height", "" + this.value);
 	map_height = Number(this.value);
 	canvas_update();
 });
 
-$(document).on("change", "#frame_size", function() {
+$(document).on("change", "#frame_size", function () {
 	frame_size = Number(this.value);
 	canvas_update();
 	if (palette != null) {
@@ -52,14 +52,14 @@ $(document).on("change", "#frame_size", function() {
 	}
 });
 
-$(document).on("change", "#map_chip", function() {
+$(document).on("change", "#map_chip", function () {
 	palette = new Image();
 	if (this.files[0] === undefined) {
 		palette.src = "./Resources/sprites/default_chip.png";
 	} else {
 		palette.src = window.URL.createObjectURL(this.files[0]);
 	}
-	palette.onload = function() {
+	palette.onload = function () {
 		palette_width = palette.naturalWidth;
 		palette_height = palette.naturalHeight;
 		palette_update();
@@ -68,12 +68,12 @@ $(document).on("change", "#map_chip", function() {
 	};
 });
 
-$(document).on("click", "#eraser_btn", function() {
+$(document).on("click", "#eraser_btn", function () {
 	select_frame = -1;
 	palette_update();
 });
 
-$(document).on("change", "#auto_generation", function() {
+$(document).on("change", "#auto_generation", function () {
 	let option = $("#auto_option");
 	switch (this.value) {
 		case "none":
@@ -101,7 +101,7 @@ $(document).on("change", "#auto_generation", function() {
 	}
 });
 
-$(document).on("click", "#generate_btn", function() {
+$(document).on("click", "#generate_btn", function () {
 	if (palette != null) {
 		let floor = Number($("#maze_floor").val());
 		let wall = Number($("#maze_wall").val());
@@ -164,14 +164,12 @@ $(document).on("click", "#generate_btn", function() {
 });
 
 //マップチップの選択
-$(document).on("click", "#palette_canvas", function(e) {
+$(document).on("click", "#palette_canvas", function (e) {
 	let rect = e.target.getBoundingClientRect();
 	let canvasX = Math.floor(
 		(e.clientX - rect.left) / (this.clientWidth / this.width) / frame_size
 	);
-	let canvasY = Math.floor(
-		(e.clientY - rect.top) / (this.clientWidth / this.width) / frame_size
-	);
+	let canvasY = Math.floor((e.clientY - rect.top) / (this.clientWidth / this.width) / frame_size);
 	console.log(canvasX, canvasY);
 
 	let canvas = $("#palette_canvas");
@@ -188,12 +186,7 @@ $(document).on("click", "#palette_canvas", function(e) {
 		for (let j = 0; j < palette_height / frame_size; j++) {
 			if (canvasX === i && canvasY === j) {
 				isSelect = true;
-				ctx.strokeRect(
-					i * frame_size,
-					j * frame_size,
-					frame_size,
-					frame_size
-				);
+				ctx.strokeRect(i * frame_size, j * frame_size, frame_size, frame_size);
 				select_frame = i + j * (palette_width / frame_size);
 				break;
 			}
@@ -204,24 +197,20 @@ $(document).on("click", "#palette_canvas", function(e) {
 
 //マップチップの配置
 let isDragging = false;
-$(document).on("touchstart", "#main_canvas", function() {
+$(document).on("touchstart", "#main_canvas", function () {
 	isDragging = true;
 });
-$(document).on("touchend", "#main_canvas", function() {
+$(document).on("touchend", "#main_canvas", function () {
 	isDragging = false;
 });
-$(document).on("touchmove", "#main_canvas", function(e) {
+$(document).on("touchmove", "#main_canvas", function (e) {
 	if (palette == null) return;
 	let rect = e.target.getBoundingClientRect();
 	let canvasX = Math.floor(
-		(e.changedTouches[0].clientX - rect.left) /
-		(this.clientWidth / this.width) /
-		frame_size
+		(e.changedTouches[0].clientX - rect.left) / (this.clientWidth / this.width) / frame_size
 	);
 	let canvasY = Math.floor(
-		(e.changedTouches[0].clientY - rect.top) /
-		(this.clientWidth / this.width) /
-		frame_size
+		(e.changedTouches[0].clientY - rect.top) / (this.clientWidth / this.width) / frame_size
 	);
 	let isSelect = false;
 
@@ -240,21 +229,19 @@ $(document).on("touchmove", "#main_canvas", function(e) {
 	drawMap();
 });
 
-$(document).on("mousedown", "#main_canvas", function() {
+$(document).on("mousedown", "#main_canvas", function () {
 	isDragging = true;
 });
-$(document).on("mouseup", "#main_canvas", function() {
+$(document).on("mouseup", "#main_canvas", function () {
 	isDragging = false;
 });
-$(document).on("mousemove", "#main_canvas", function(e) {
+$(document).on("mousemove", "#main_canvas", function (e) {
 	if (palette == null) return;
 	let rect = e.target.getBoundingClientRect();
 	let canvasX = Math.floor(
 		(e.clientX - rect.left) / (this.clientWidth / this.width) / frame_size
 	);
-	let canvasY = Math.floor(
-		(e.clientY - rect.top) / (this.clientWidth / this.width) / frame_size
-	);
+	let canvasY = Math.floor((e.clientY - rect.top) / (this.clientWidth / this.width) / frame_size);
 
 	let isSelect = false;
 
@@ -273,14 +260,14 @@ $(document).on("mousemove", "#main_canvas", function(e) {
 	drawMap();
 });
 
-$(document).on("click", "#upload_btn", function() {
+$(document).on("click", "#upload_btn", function () {
 	let link = document.createElement("input");
 	link.type = "file";
 	link.accept = "application/json";
 	link.click();
-	link.addEventListener("change", function() {
+	link.addEventListener("change", function () {
 		let load_map;
-		link.files[0].text().then(function(result) {
+		link.files[0].text().then(function (result) {
 			load_map = JSON.parse(result);
 			map = [];
 			map = load_map;
@@ -290,12 +277,12 @@ $(document).on("click", "#upload_btn", function() {
 	});
 });
 
-$(document).on("click", "#output_btn", function() {
+$(document).on("click", "#output_btn", function () {
 	let link, blob;
 	switch ($("#output_format").val()) {
 		case "json file":
 			blob = new Blob([JSON.stringify(map, null, "\t")], {
-				type: "json"
+				type: "json",
 			});
 			link = document.createElement("a");
 			link.href = window.URL.createObjectURL(blob);
@@ -316,12 +303,8 @@ $(document).on("click", "#output_btn", function() {
 			for (let i = 0; i < map_width / frame_size; i++) {
 				for (let j = 0; j < map_height / frame_size; j++) {
 					if (map[i][j] >= 0) {
-						let y = Math.floor(
-							map[i][j] / (palette_width / frame_size)
-						);
-						let x = Math.floor(
-							map[i][j] - (palette_width / frame_size) * y
-						);
+						let y = Math.floor(map[i][j] / (palette_width / frame_size));
+						let x = Math.floor(map[i][j] - (palette_width / frame_size) * y);
 						ctx.drawImage(
 							palette,
 							x * frame_size,
@@ -377,9 +360,7 @@ function canvas_update() {
 
 function palette_update() {
 	let canvas = $("#palette_canvas");
-	canvas
-		.attr("width", "" + palette_width)
-		.attr("height", "" + palette_height);
+	canvas.attr("width", "" + palette_width).attr("height", "" + palette_height);
 
 	let ctx = canvas[0].getContext("2d");
 
@@ -418,9 +399,7 @@ function drawMap() {
 		for (let j = 0; j < map_height / frame_size; j++) {
 			if (map[i][j] >= 0) {
 				let y = Math.floor(map[i][j] / (palette_width / frame_size));
-				let x = Math.floor(
-					map[i][j] - (palette_width / frame_size) * y
-				);
+				let x = Math.floor(map[i][j] - (palette_width / frame_size) * y);
 				ctx.drawImage(
 					palette,
 					x * frame_size,
@@ -455,7 +434,7 @@ function drawMap() {
 	return true;
 }
 
-window.onload = function() {
+window.onload = function () {
 	let url = new URL(window.location.href);
 	let params = url.searchParams;
 	let map_data = params.get("map_data");
@@ -463,13 +442,7 @@ window.onload = function() {
 	let height = params.get("height");
 	let size = params.get("size");
 	canvas_update();
-	if (
-		map_data != null &&
-		width != null &&
-		height != null &&
-		size != null &&
-		Number(size) > 0
-	) {
+	if (map_data != null && width != null && height != null && size != null && Number(size) > 0) {
 		map = [];
 		map = JSON.parse(map_data);
 		map_width = Number(width);

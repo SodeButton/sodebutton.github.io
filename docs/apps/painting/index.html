@@ -68,8 +68,8 @@
 	$(document).on("mousedown", "#main_canvas", function(e) {
 		isDragging = true;
 		let rect = e.target.getBoundingClientRect();
-		x = (e.changedTouches[0].clientX - rect.left) / (this.clientWidth / this.width);
-		y = (e.changedTouches[0].clientY - rect.top) / (this.clientWidth / this.width);
+		x = (e.clientX - rect.left) / (this.clientWidth / this.width);
+		y = (e.clientY - rect.top) / (this.clientWidth / this.width);
 		new_position = { x: x, y: y };
 	});
 	$(document).on("mouseup", "#main_canvas", function() {
