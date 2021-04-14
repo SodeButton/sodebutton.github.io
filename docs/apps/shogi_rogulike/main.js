@@ -211,7 +211,103 @@ class GameScene extends Phaser.Scene {
 		}
 	}
 
-	setup() {
+	searchMovementPos(pointer) {
+		//if touch shogi piece
+		for (let x = 0; x < 9; x++) {
+			for (let y = 0; y < 9; y++) {
+				if (
+					pointer.x >= x * 64 + 64 - 32 &&
+					pointer.x < x * 64 + 64 + 32 &&
+					pointer.y >= y * 64 + 256 - 32 &&
+					pointer.y < y * 64 + 256 + 32
+				) {
+					if (select_object == null) {
+						switch (board[x][y].name) {
+							case "king":
+								board[x][y].select = true;
+								select_object = board[x][y];
+								select_object.boardX = x;
+								select_object.boardY = y;
+								for (let dx = -1; dx <= 1; dx++) {
+									for (let dy = -1; dy <= 1; dy++) {
+										if (dx === 0 && dy === 0) continue;
+										if (
+											x + dx >= 0 &&
+											x + dx < 9 &&
+											y + dy >= 0 &&
+											y + dy < 9
+										) {
+											if (board[x + dx][y + dy] === 0) {
+												let ibc = this.add.image(
+													(x + dx) * 64 + 64,
+													(y + dy) * 64 + 256,
+													"input_board_chip"
+												);
+												ibc.select = false;
+												ibc.name = "input_board_chip";
+												ibc.select_object = board[x][y];
+												board[x + dx][y + dy] = ibc;
+											}
+										}
+									}
+								}
+								break;
+						}
+					} else if (board[x][y].select) {
+						board[x][y].select = false;
+						select_object = null;
+						for (let x1 = 0; x1 < 9; x1++) {
+							for (let y1 = 0; y1 < 9; y1++) {
+								if (board[x1][y1].name === "input_board_chip") {
+									board[x1][y1].destroy();
+									board[x1][y1] = 0;
+								}
+							}
+						}
+						this.drawBoard();
+						this.drawObject();
+					}
+					return;
+				}
+			}
+		}
+	}
+
+	selectMovementPos(pointer) {
+		//if touch shogi piece
+
+		if (select_object != null) {
+			for (let x = 0; x < 9; x++) {
+				for (let y = 0; y < 9; y++) {
+					if (
+						pointer.x >= x * 64 + 64 - 32 &&
+						pointer.x < x * 64 + 64 + 32 &&
+						pointer.y >= y * 64 + 256 - 32 &&
+						pointer.y < y * 64 + 256 + 32
+					) {
+						if (board[x][y].name === "input_board_chip") {
+							board[x][y] = select_object;
+							board[select_object.boardX][select_object.boardY].destroy();
+							board[select_object.boardX][select_object.boardY] = 0;
+							select_object = null;
+							for (let x1 = 0; x1 < 9; x1++) {
+								for (let y1 = 0; y1 < 9; y1++) {
+									if (board[x1][y1] !== 0) {
+										if (board[x1][y1].name === "input_board_chip") {
+											board[x1][y1].destroy();
+											board[x1][y1] = 0;
+										}
+									}
+								}
+							}
+							this.drawBoard();
+							this.drawObject();
+							return;
+						}
+					}
+				}
+			}
+		}
 	}
 
 	update(time, delta) {
@@ -226,80 +322,8 @@ class GameScene extends Phaser.Scene {
 			if (pointer.isDown) {
 				if (!isDown) {
 					isDown = true;
-					let loop = false;
-					//if touch shogi piece
-					for (let x = 0; x < 9; x++) {
-						for (let y = 0; y < 9; y++) {
-							if (
-								pointer.x >= x * 64 + 64 - 32 &&
-								pointer.x < x * 64 + 64 + 32 &&
-								pointer.y >= y * 64 + 256 - 32 &&
-								pointer.y < y * 64 + 256 + 32
-							) {
-								if (!board[x][y].select) {
-									switch (board[x][y].name) {
-										case "king":
-											board[x][y].select = true;
-											for (let dx = -1; dx <= 1; dx++) {
-												for (let dy = -1; dy <= 1; dy++) {
-													if (dx === 0 && dy === 0) continue;
-													if (
-														x + dx >= 0 &&
-														x + dx < 9 &&
-														y + dy >= 0 &&
-														y + dy < 9
-													) {
-														if (board[x + dx][y + dy] === 0) {
-															let ibc = this.add.image(
-																(x + dx) * 64 + 64,
-																(y + dy) * 64 + 256,
-																"input_board_chip"
-															);
-															ibc.select = false;
-															ibc.name = "input_board_chip";
-															ibc.select_object = board[x][y];
-															board[x + dx][y + dy] = ibc;
-														}
-													}
-												}
-											}
-											break;
-										case "input_board_chip":
-											let select_object = board[x][y].select_object;
-											for (let x1 = 0; x1 < 9; x1++) {
-												for (let y1 = 0; y1 < 9; y1++) {
-													if (board[x1][y1].name === "input_board_chip") {
-														if (board[x1][y1].select_object != null)
-															board[x1][y1].select_object.destroy();
-														board[x1][y1].destroy();
-														board[x1][y1] = 0;
-													}
-												}
-											}
-											board[x][y] = select_object;
-											this.drawBoard();
-											this.drawObject();
-											break;
-									}
-								} else if (board[x][y].select) {
-									board[x][y].select = null;
-									for (let x1 = 0; x1 < 9; x1++) {
-										for (let y1 = 0; y1 < 9; y1++) {
-											if (board[x1][y1].name === "input_board_chip") {
-												board[x1][y1].destroy();
-												board[x1][y1] = 0;
-											}
-										}
-									}
-									this.drawBoard();
-									this.drawObject();
-								}
-								loop = true;
-								break;
-							}
-						}
-						if (loop) break;
-					}
+					this.selectMovementPos(pointer);
+					this.searchMovementPos(pointer);
 				}
 			} else {
 				isDown = false;
