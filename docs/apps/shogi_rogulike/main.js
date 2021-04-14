@@ -66,6 +66,7 @@ class LoadScene extends Phaser.Scene {
 		this.load.image("fu", "./fu.png");
 		this.load.image("fu_nari", "./fu_nari.png");
 		this.load.image("board_chip", "./board_chip.png");
+		this.load.image("input_board_chip", "./input_board_chip.png");
 		this.load.image("tatami", "./tatami.jpg");
 
 		// this.load.audio("shoot1", "./Audios/Shoot1.wav");
@@ -155,6 +156,11 @@ class StartScene extends Phaser.Scene {
 
 let board = [];
 let player;
+let isFade = false;
+let isDown = false;
+let select_object = null;
+let input_board_chips = [];
+
 for (let i = 0; i < 9; i++) board[i] = new Array(9).fill(0);
 
 class GameScene extends Phaser.Scene {
@@ -162,21 +168,22 @@ class GameScene extends Phaser.Scene {
 		super({ key: "gameScene" });
 	}
 
-	create() {
+	async create() {
 		let background = this.add.image(0, 0, "tatami");
 		background.setOrigin(0, 0);
 		background.displayWidth = game_width;
 		background.displayHeight = game_height;
+		this.drawBoard();
 
-		for (let x = 0; x < 9; x++) {
-			for (let y = 0; y < 9; y++) {
-				this.add.image(x * 64 + 64, y * 64 + 256, "board_chip");
-			}
-		}
+		board[4][8] = this.add.image(256 + 64, 512 + 256, "king");
+		board[4][8].name = "king";
+
+		this.drawObject();
 
 		let fade1 = this.add.graphics();
 		fade1.fillStyle(0x000000, 1).fillRect(0, 0, game_width, game_height);
 		fade1.alpha = 1;
+
 		this.tweens.add({
 			targets: fade1,
 			alpha: 0,
@@ -185,17 +192,122 @@ class GameScene extends Phaser.Scene {
 		});
 	}
 
-	setup() {
-		board[4][9] = "king";
+	drawBoard() {
+		for (let x = 0; x < 9; x++) {
+			for (let y = 0; y < 9; y++) {
+				if (board[x][y] === 0) this.add.image(x * 64 + 64, y * 64 + 256, "board_chip");
+			}
+		}
+	}
 
-		// player = this.add.image();
+	drawObject() {
+		for (let x = 0; x < 9; x++) {
+			for (let y = 0; y < 9; y++) {
+				switch (board[x][y].name) {
+					case "king":
+						board[x][y].destroy();
+						board[x][y] = this.add.image(x * 64 + 64, y * 64 + 256, "king");
+						board[x][y].name = "king";
+						board[x][y].select = false;
+						break;
+				}
+			}
+		}
+	}
+
+	setup() {
 	}
 
 	update(time, delta) {
-		fadeTime += delta / 1000;
-		if (fadeTime >= 1.0) {
-			fadeTime = 0;
-			this.setup();
+		if (!isFade) {
+			fadeTime += delta / 1000;
+			if (fadeTime >= 1.0) {
+				fadeTime = 0;
+				isFade = true;
+			}
+		} else {
+			let pointer = this.input.activePointer;
+			if (pointer.isDown) {
+				if (!isDown) {
+					isDown = true;
+					let loop = false;
+					//if touch shogi piece
+					for (let x = 0; x < 9; x++) {
+						for (let y = 0; y < 9; y++) {
+							if (
+								pointer.x >= x * 64 + 64 - 32 &&
+								pointer.x < x * 64 + 64 + 32 &&
+								pointer.y >= y * 64 + 256 - 32 &&
+								pointer.y < y * 64 + 256 + 32
+							) {
+								if (!board[x][y].select) {
+									board[x][y].select = true;
+									switch (board[x][y].name) {
+										case "king":
+											for (let dx = -1; dx <= 1; dx++) {
+												for (let dy = -1; dy <= 1; dy++) {
+													if (dx === 0 && dy === 0) continue;
+													if (
+														x + dx >= 0 &&
+														x + dx < 9 &&
+														y + dy >= 0 &&
+														y + dy < 9
+													) {
+														if (board[x + dx][y + dy] === 0) {
+															let ibc = this.add.image(
+																(x + dx) * 64 + 64,
+																(y + dy) * 64 + 256,
+																"input_board_chip"
+															);
+															ibc.select = false;
+															ibc.name = "input_board_chip";
+															ibc.select_object = board[x][y];
+															board[x + dx][y + dy] = ibc;
+														}
+													}
+												}
+											}
+											break;
+										case "input_board_chip":
+											let select_object = board[x][y].select_object;
+											for (let x1 = 0; x1 < 9; x1++) {
+												for (let y1 = 0; y1 < 9; y1++) {
+													if (board[x1][y1].name === "input_board_chip") {
+														if (board[x1][y1].select_object != null)
+															board[x1][y1].select_object.destroy();
+														board[x1][y1].destroy();
+														board[x1][y1] = 0;
+													}
+												}
+											}
+											board[x][y] = select_object;
+											this.drawBoard();
+											this.drawObject();
+											break;
+									}
+								} else if (board[x][y].select) {
+									board[x][y].select = null;
+									for (let x1 = 0; x1 < 9; x1++) {
+										for (let y1 = 0; y1 < 9; y1++) {
+											if (board[x1][y1].name === "input_board_chip") {
+												board[x1][y1].destroy();
+												board[x1][y1] = 0;
+											}
+										}
+									}
+									this.drawBoard();
+									this.drawObject();
+								}
+								loop = true;
+								break;
+							}
+						}
+						if (loop) break;
+					}
+				}
+			} else {
+				isDown = false;
+			}
 		}
 	}
 }
