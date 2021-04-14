@@ -1,7 +1,3 @@
-/**
- * Author : Button501
- * License : MIT License
- */
 "use strict";
 const game_width = 64 * 10;
 const game_height = 64 * 16;
@@ -241,9 +237,9 @@ class GameScene extends Phaser.Scene {
 								pointer.y < y * 64 + 256 + 32
 							) {
 								if (!board[x][y].select) {
-									board[x][y].select = true;
 									switch (board[x][y].name) {
 										case "king":
+											board[x][y].select = true;
 											for (let dx = -1; dx <= 1; dx++) {
 												for (let dy = -1; dy <= 1; dy++) {
 													if (dx === 0 && dy === 0) continue;
