@@ -168,7 +168,7 @@ class GameScene extends Phaser.Scene {
 		super({ key: "gameScene" });
 	}
 
-	async create() {
+	create() {
 		let background = this.add.image(0, 0, "tatami");
 		background.setOrigin(0, 0);
 		background.displayWidth = game_width;
