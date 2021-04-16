@@ -19,7 +19,7 @@ class LoadScene extends Phaser.Scene {
 
 		let text = this.add.text(game_width / 2, (game_height / 5) * 3, "load", {
 			fontSize: "40px",
-			fontFamily: "serif"
+			fontFamily: "serif",
 		});
 		text.setOrigin(0.5, 0.5);
 
@@ -36,12 +36,12 @@ class LoadScene extends Phaser.Scene {
 		});
 
 		//ファイルのロードに入ったときの処理
-		this.load.on("fileprogress", function(file) {
+		this.load.on("fileprogress", function (file) {
 			text.text = file.key;
 		});
 
 		//すべてのロードが完了したときの処理
-		this.load.on("complete", function() {
+		this.load.on("complete", function () {
 			text.text = "complete";
 		});
 		this.load.setPath("./Resources/Sprites");
@@ -91,28 +91,28 @@ class StartScene extends Phaser.Scene {
 		title = this.add.text(game_width / 2, game_height / 4, "将棋ローグライク", {
 			fontSize: "60px",
 			fontFamily: "serif",
-			color: "#000000"
+			color: "#000000",
 		});
 		title.setOrigin(0.5, 0.5);
 
 		tapText = this.add.text(game_width / 2, game_height * 0.7, "スタート", {
 			fontSize: "30px",
 			fontFamily: "serif",
-			color: "#000000"
+			color: "#000000",
 		});
 		tapText.setOrigin(0.5, 0.5);
 
 		versionText = this.add.text(25, game_height - 10, "Version：0.0.1", {
 			fontSize: "30px",
 			fontFamily: "serif",
-			color: "#000000"
+			color: "#000000",
 		});
 		versionText.setOrigin(0, 1);
 
 		copyrightText = this.add.text(game_width - 25, game_height - 10, "©2021 Button501", {
 			fontSize: "30px",
 			fontFamily: "serif",
-			color: "#000000"
+			color: "#000000",
 		});
 		copyrightText.setOrigin(1, 1);
 
@@ -121,12 +121,12 @@ class StartScene extends Phaser.Scene {
 		fade.alpha = 0;
 		this.input.once(
 			"pointerdown",
-			function() {
+			function () {
 				this.tweens.add({
 					targets: fade,
 					alpha: 1,
 					duration: 1000,
-					ease: "Power2"
+					ease: "Power2",
 				});
 				isClick = true;
 			},
@@ -152,11 +152,11 @@ class StartScene extends Phaser.Scene {
 
 let board = [];
 let shogiPiece = [];
-let player;
 let isFade = false;
 let isDown = false;
 let select_object = null;
-let input_board_chips = [];
+
+let shadow;
 
 for (let i = 0; i < 9; i++) {
 	board[i] = new Array(9).fill(0);
@@ -188,7 +188,7 @@ class GameScene extends Phaser.Scene {
 			targets: fade1,
 			alpha: 0,
 			duration: 1000,
-			ease: "Power2"
+			ease: "Power2",
 		});
 	}
 
@@ -218,7 +218,23 @@ class GameScene extends Phaser.Scene {
 									? shogiPiece[x][y].select
 									: false;
 							shogiPiece[x][y].destroy();
-							shogiPiece[x][y] = this.add.image(x * 64 + 64, y * 64 + 256, "king");
+							if (shadow != null) shadow.destroy();
+							if (select) {
+								shadow = this.add.image(x * 64 + 64 + 8, y * 64 + 256 + 8, "king");
+								shadow.tint = 0x000000;
+								shadow.alpha = 0.6;
+								shogiPiece[x][y] = this.add.image(
+									x * 64 + 64,
+									y * 64 + 256,
+									"king"
+								);
+							} else {
+								shogiPiece[x][y] = this.add.image(
+									x * 64 + 64,
+									y * 64 + 256,
+									"king"
+								);
+							}
 							shogiPiece[x][y].name = "king";
 							shogiPiece[x][y].select = select;
 							break;
@@ -353,14 +369,14 @@ const config = {
 	height: game_height,
 	scale: {
 		mode: Phaser.Scale.FIT,
-		autoCenter: Phaser.Scale.CENTER_HORIZONTALLY
+		autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
 	},
 	pixelArt: true,
 	physics: {
 		default: "arcade",
 		arcade: {
-			gravity: { y: 0 }
-		}
+			gravity: { y: 0 },
+		},
 	},
 	scene: [LoadScene, StartScene, GameScene],
 };
