@@ -335,7 +335,7 @@ class GameScene extends Phaser.Scene {
 			if (pointer.isDown) {
 				if (!isDown) {
 					isDown = true;
-					//ここかなりヤヴァイ
+					//ここかなりヤヴァイかも
 					if (!this.selectMovementPos(pointer)) {
 						this.searchMovementPos(pointer);
 					}
