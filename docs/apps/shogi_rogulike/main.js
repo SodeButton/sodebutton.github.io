@@ -151,13 +151,17 @@ class StartScene extends Phaser.Scene {
 }
 
 let board = [];
+let shogiPiece = [];
 let player;
 let isFade = false;
 let isDown = false;
 let select_object = null;
 let input_board_chips = [];
 
-for (let i = 0; i < 9; i++) board[i] = new Array(9).fill(0);
+for (let i = 0; i < 9; i++) {
+	board[i] = new Array(9).fill(0);
+	shogiPiece[i] = new Array(9).fill(null);
+}
 
 class GameScene extends Phaser.Scene {
 	constructor() {
@@ -171,8 +175,8 @@ class GameScene extends Phaser.Scene {
 		background.displayHeight = game_height;
 		this.drawBoard();
 
-		board[4][8] = this.add.image(256 + 64, 512 + 256, "king");
-		board[4][8].name = "king";
+		shogiPiece[4][8] = this.add.image(256 + 64, 512 + 256, "king");
+		shogiPiece[4][8].name = "king";
 
 		this.drawObject();
 
@@ -191,7 +195,14 @@ class GameScene extends Phaser.Scene {
 	drawBoard() {
 		for (let x = 0; x < 9; x++) {
 			for (let y = 0; y < 9; y++) {
-				if (board[x][y] === 0) this.add.image(x * 64 + 64, y * 64 + 256, "board_chip");
+				switch (board[x][y]) {
+					case 0:
+						this.add.image(x * 64 + 64, y * 64 + 256, "board_chip");
+						break;
+					case 1:
+						this.add.image(x * 64 + 64, y * 64 + 256, "input_board_chip");
+						break;
+				}
 			}
 		}
 	}
@@ -199,13 +210,19 @@ class GameScene extends Phaser.Scene {
 	drawObject() {
 		for (let x = 0; x < 9; x++) {
 			for (let y = 0; y < 9; y++) {
-				switch (board[x][y].name) {
-					case "king":
-						board[x][y].destroy();
-						board[x][y] = this.add.image(x * 64 + 64, y * 64 + 256, "king");
-						board[x][y].name = "king";
-						board[x][y].select = false;
-						break;
+				if (shogiPiece[x][y] != null) {
+					switch (shogiPiece[x][y].name) {
+						case "king":
+							let select =
+								shogiPiece[x][y]?.select !== undefined
+									? shogiPiece[x][y].select
+									: false;
+							shogiPiece[x][y].destroy();
+							shogiPiece[x][y] = this.add.image(x * 64 + 64, y * 64 + 256, "king");
+							shogiPiece[x][y].name = "king";
+							shogiPiece[x][y].select = select;
+							break;
+					}
 				}
 			}
 		}
@@ -222,12 +239,10 @@ class GameScene extends Phaser.Scene {
 					pointer.y < y * 64 + 256 + 32
 				) {
 					if (select_object == null) {
-						switch (board[x][y].name) {
+						switch (shogiPiece[x][y]?.name) {
 							case "king":
-								board[x][y].select = true;
-								select_object = board[x][y];
-								select_object.boardX = x;
-								select_object.boardY = y;
+								shogiPiece[x][y].select = true;
+								select_object = shogiPiece[x][y];
 								for (let dx = -1; dx <= 1; dx++) {
 									for (let dy = -1; dy <= 1; dy++) {
 										if (dx === 0 && dy === 0) continue;
@@ -237,36 +252,27 @@ class GameScene extends Phaser.Scene {
 											y + dy >= 0 &&
 											y + dy < 9
 										) {
-											if (board[x + dx][y + dy] === 0) {
-												let ibc = this.add.image(
-													(x + dx) * 64 + 64,
-													(y + dy) * 64 + 256,
-													"input_board_chip"
-												);
-												ibc.select = false;
-												ibc.name = "input_board_chip";
-												ibc.select_object = board[x][y];
-												board[x + dx][y + dy] = ibc;
+											if (shogiPiece[x + dx][y + dy] == null) {
+												board[x + dx][y + dy] = 1;
 											}
 										}
 									}
 								}
 								break;
 						}
-					} else if (board[x][y].select) {
-						board[x][y].select = false;
-						select_object = null;
-						for (let x1 = 0; x1 < 9; x1++) {
-							for (let y1 = 0; y1 < 9; y1++) {
-								if (board[x1][y1].name === "input_board_chip") {
-									board[x1][y1].destroy();
-									board[x1][y1] = 0;
+					} else {
+						if (shogiPiece[x][y]?.select) {
+							shogiPiece[x][y].select = false;
+							select_object = null;
+							for (let i = 0; i < 9; i++) {
+								for (let j = 0; j < 9; j++) {
+									board[i][j] = 0;
 								}
 							}
 						}
-						this.drawBoard();
-						this.drawObject();
 					}
+					this.drawBoard();
+					this.drawObject();
 					return;
 				}
 			}
@@ -275,7 +281,6 @@ class GameScene extends Phaser.Scene {
 
 	selectMovementPos(pointer) {
 		//if touch shogi piece
-
 		if (select_object != null) {
 			for (let x = 0; x < 9; x++) {
 				for (let y = 0; y < 9; y++) {
@@ -285,28 +290,36 @@ class GameScene extends Phaser.Scene {
 						pointer.y >= y * 64 + 256 - 32 &&
 						pointer.y < y * 64 + 256 + 32
 					) {
-						if (board[x][y].name === "input_board_chip") {
-							board[x][y] = select_object;
-							board[select_object.boardX][select_object.boardY].destroy();
-							board[select_object.boardX][select_object.boardY] = 0;
-							select_object = null;
+						if (board[x][y] === 1) {
 							for (let x1 = 0; x1 < 9; x1++) {
 								for (let y1 = 0; y1 < 9; y1++) {
-									if (board[x1][y1] !== 0) {
-										if (board[x1][y1].name === "input_board_chip") {
-											board[x1][y1].destroy();
-											board[x1][y1] = 0;
+									if (shogiPiece[x1][y1]?.select) {
+										shogiPiece[x][y] = this.add.image(
+											x1 * 64 + 64,
+											y1 * 64 + 256,
+											shogiPiece[x1][y1].texture
+										);
+										shogiPiece[x][y].name = shogiPiece[x1][y1].name;
+										shogiPiece[x][y].select = false;
+										shogiPiece[x1][y1].destroy();
+										shogiPiece[x1][y1] = null;
+										select_object = null;
+										for (let i = 0; i < 9; i++) {
+											for (let j = 0; j < 9; j++) {
+												board[i][j] = 0;
+											}
 										}
+										this.drawBoard();
+										this.drawObject();
+										return true;
 									}
 								}
 							}
-							this.drawBoard();
-							this.drawObject();
-							return;
 						}
 					}
 				}
 			}
+			return false;
 		}
 	}
 
@@ -322,8 +335,9 @@ class GameScene extends Phaser.Scene {
 			if (pointer.isDown) {
 				if (!isDown) {
 					isDown = true;
-					this.selectMovementPos(pointer);
-					this.searchMovementPos(pointer);
+					if (!this.selectMovementPos(pointer)) {
+						this.searchMovementPos(pointer);
+					}
 				}
 			} else {
 				isDown = false;
