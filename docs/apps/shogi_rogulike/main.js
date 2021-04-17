@@ -102,7 +102,7 @@ class StartScene extends Phaser.Scene {
 		});
 		tapText.setOrigin(0.5, 0.5);
 
-		versionText = this.add.text(30, game_height - 10, "Version：0.0.1", {
+		versionText = this.add.text(30, game_height - 10, "Ver beta0.0.1", {
 			fontSize: "30px",
 			fontFamily: "mohitsuFont",
 			color: "#000000",
@@ -381,7 +381,7 @@ class GameScene extends Phaser.Scene {
 				if (shogiPiece[x][y]?.piece_type === "enemy" && !shogiPiece[x][y]?.select) {
 					switch (shogiPiece[x][y].name) {
 						case "fu":
-							if (y + 1 >= 0 && y < 9) {
+							if (y + 1 >= 0 && y < 8) {
 								if (shogiPiece[x][y + 1] == null) {
 									shogiPiece[x][y + 1] = this.add.image(
 										x * 64 + 64,
