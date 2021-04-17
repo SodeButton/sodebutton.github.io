@@ -65,7 +65,8 @@ class LoadScene extends Phaser.Scene {
 		this.load.image("input_board_chip", "./input_board_chip.png");
 		this.load.image("tatami", "./tatami.jpg");
 
-		// this.load.audio("shoot1", "./Audios/Shoot1.wav");
+		this.load.setPath("./Resources/Audios");
+		this.load.audio("se_shogi", "./se_shogi.wav");
 		// this.load.audio("shoot4", "./Audios/Shoot4.wav");
 		// this.load.audio("explosion1", "./Audios/Explosion1.wav");
 		// this.load.audio("bgm1", "./Audios/bgm1.ogg");
@@ -90,29 +91,33 @@ class StartScene extends Phaser.Scene {
 		background.displayHeight = game_height;
 		title = this.add.text(game_width / 2, game_height / 4, "将棋ローグライク", {
 			fontSize: "60px",
-			fontFamily: "serif",
+			fontFamily: "mohitsuFont",
 			color: "#000000",
+			padding: { left: 0, right: 0, bottom: 0, top: 4 },
 		});
 		title.setOrigin(0.5, 0.5);
 
 		tapText = this.add.text(game_width / 2, game_height * 0.7, "スタート", {
 			fontSize: "30px",
-			fontFamily: "serif",
+			fontFamily: "mohitsuFont",
 			color: "#000000",
+			padding: { left: 0, right: 0, bottom: 0, top: 4 },
 		});
 		tapText.setOrigin(0.5, 0.5);
 
-		versionText = this.add.text(25, game_height - 10, "Version：0.0.1", {
+		versionText = this.add.text(30, game_height - 10, "Version：0.0.1", {
 			fontSize: "30px",
-			fontFamily: "serif",
+			fontFamily: "mohitsuFont",
 			color: "#000000",
+			padding: { left: 0, right: 0, bottom: 0, top: 4 },
 		});
 		versionText.setOrigin(0, 1);
 
-		copyrightText = this.add.text(game_width - 25, game_height - 10, "©2021 Button501", {
+		copyrightText = this.add.text(game_width - 30, game_height - 10, "(c)2021 Button501", {
 			fontSize: "30px",
-			fontFamily: "serif",
+			fontFamily: "mohitsuFont",
 			color: "#000000",
+			padding: { left: 0, right: 0, bottom: 0, top: 4 },
 		});
 		copyrightText.setOrigin(1, 1);
 
@@ -152,6 +157,8 @@ class StartScene extends Phaser.Scene {
 
 let board = [];
 let shogiPiece = [];
+
+let se = [];
 let isFade = false;
 let isDown = false;
 let select_object = null;
@@ -195,6 +202,8 @@ class GameScene extends Phaser.Scene {
 			duration: 1000,
 			ease: "Power2",
 		});
+
+		se.shogi = this.sound.add("se_shogi");
 	}
 
 	setup() {}
@@ -283,6 +292,7 @@ class GameScene extends Phaser.Scene {
 										board[i][j] = 0;
 									}
 								}
+								se.shogi.play();
 							}
 						}
 						this.drawBoard();
@@ -325,6 +335,7 @@ class GameScene extends Phaser.Scene {
 												board[i][j] = 0;
 											}
 										}
+										se.shogi.play();
 										this.drawBoard();
 										this.drawObject();
 										return true;
