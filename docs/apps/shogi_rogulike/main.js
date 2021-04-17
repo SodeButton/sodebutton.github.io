@@ -19,7 +19,7 @@ class LoadScene extends Phaser.Scene {
 
 		let text = this.add.text(game_width / 2, (game_height / 5) * 3, "load", {
 			fontSize: "40px",
-			fontFamily: "serif",
+			fontFamily: "mohitsuFont",
 		});
 		text.setOrigin(0.5, 0.5);
 
@@ -161,6 +161,8 @@ let isFade = false;
 let isDown = false;
 let select_object = null;
 
+let game_turn = "player";
+
 for (let i = 0; i < 9; i++) {
 	board[i] = new Array(9).fill(0);
 	shogiPiece[i] = new Array(9).fill(null);
@@ -239,6 +241,7 @@ class GameScene extends Phaser.Scene {
 					shogiPiece[x][y].destroy();
 					if (select) {
 						let shadow = this.add.image(x * 64 + 64 + 8, y * 64 + 256 + 8, name);
+						if (piece_type === "enemy") shogiPiece[x][y].angle = 180;
 						shadow.tint = 0x000000;
 						shadow.alpha = 0.6;
 					}
@@ -304,7 +307,6 @@ class GameScene extends Phaser.Scene {
 	}
 
 	selectMovementPos(pointer) {
-		//if touch shogi piece
 		if (select_object != null) {
 			for (let x = 0; x < 9; x++) {
 				for (let y = 0; y < 9; y++) {
@@ -318,6 +320,7 @@ class GameScene extends Phaser.Scene {
 							for (let x1 = 0; x1 < 9; x1++) {
 								for (let y1 = 0; y1 < 9; y1++) {
 									if (shogiPiece[x1][y1]?.select) {
+										game_turn = "enemy";
 										if (board[x][y] === 1) {
 											shogiPiece[x][y] = this.add.image(
 												x1 * 64 + 64,
@@ -346,7 +349,7 @@ class GameScene extends Phaser.Scene {
 												shogiPiece[x1][y1].texture
 											);
 											shogiPiece[x][y].name = shogiPiece[x1][y1].name;
-											shogiPiece[x][y].piece_type = shogiPiece[x1][y1].piece_type;
+											shogiPiece[x][y].piece_type = "player";
 											shogiPiece[x][y].select = false;
 											shogiPiece[x1][y1].destroy();
 											shogiPiece[x1][y1] = null;
@@ -372,6 +375,41 @@ class GameScene extends Phaser.Scene {
 		return false;
 	}
 
+	enemyMove() {
+		for (let x = 0; x < 9; x++) {
+			for (let y = 0; y < 9; y++) {
+				if (shogiPiece[x][y]?.piece_type === "enemy" && !shogiPiece[x][y]?.select) {
+					switch (shogiPiece[x][y].name) {
+						case "fu":
+							if (y + 1 >= 0 && y < 9) {
+								if (shogiPiece[x][y + 1] == null) {
+									shogiPiece[x][y + 1] = this.add.image(
+										x * 64 + 64,
+										(y + 1) * 64 + 256,
+										shogiPiece[x][y].texture
+									);
+									shogiPiece[x][y + 1].name = shogiPiece[x][y].name;
+									shogiPiece[x][y + 1].piece_type = "enemy";
+									shogiPiece[x][y + 1].select = true;
+									shogiPiece[x][y + 1].angle = 180;
+									shogiPiece[x][y].destroy();
+									shogiPiece[x][y] = null;
+								}
+							}
+							break;
+					}
+				}
+			}
+		}
+		for (let x = 0; x < 9; x++) {
+			for (let y = 0; y < 9; y++) {
+				if (shogiPiece[x][y]?.piece_type === "enemy" && shogiPiece[x][y]?.select) {
+					shogiPiece[x][y].select = false;
+				}
+			}
+		}
+	}
+
 	update(time, delta) {
 		if (!isFade) {
 			fadeTime += delta / 1000;
@@ -380,17 +418,22 @@ class GameScene extends Phaser.Scene {
 				isFade = true;
 			}
 		} else {
-			let pointer = this.input.activePointer;
-			if (pointer.isDown) {
-				if (!isDown) {
-					isDown = true;
-					//ここかなりヤヴァイかも
-					if (!this.selectMovementPos(pointer)) {
-						this.searchMovementPos(pointer);
+			if (game_turn === "player") {
+				let pointer = this.input.activePointer;
+				if (pointer.isDown) {
+					if (!isDown) {
+						isDown = true;
+						//ここかなりヤヴァイかも
+						if (!this.selectMovementPos(pointer)) {
+							this.searchMovementPos(pointer);
+						}
 					}
+				} else {
+					isDown = false;
 				}
-			} else {
-				isDown = false;
+			} else if (game_turn === "enemy") {
+				this.enemyMove();
+				game_turn = "player";
 			}
 		}
 	}
