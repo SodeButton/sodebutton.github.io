@@ -156,8 +156,6 @@ let isFade = false;
 let isDown = false;
 let select_object = null;
 
-let shadow;
-
 for (let i = 0; i < 9; i++) {
 	board[i] = new Array(9).fill(0);
 	shogiPiece[i] = new Array(9).fill(null);
@@ -168,17 +166,24 @@ class GameScene extends Phaser.Scene {
 		super({ key: "gameScene" });
 	}
 
-	create() {
+	async create() {
 		let background = this.add.image(0, 0, "tatami");
 		background.setOrigin(0, 0);
 		background.displayWidth = game_width;
 		background.displayHeight = game_height;
-		this.drawBoard();
+		await this.drawBoard();
 
-		shogiPiece[4][8] = this.add.image(256 + 64, 512 + 256, "king");
+		shogiPiece[4][0] = this.add.image(4 * 64 + 64, 256, "fu");
+		shogiPiece[4][0].piece_type = "enemy";
+		shogiPiece[4][0].name = "fu";
+		shogiPiece[4][0].select = false;
+
+		shogiPiece[4][8] = this.add.image(4 * 64 + 64, 8 * 64 + 256, "king");
+		shogiPiece[4][8].piece_type = "player";
 		shogiPiece[4][8].name = "king";
+		shogiPiece[4][8].select = false;
 
-		this.drawObject();
+		await this.drawObject();
 
 		let fade1 = this.add.graphics();
 		fade1.fillStyle(0x000000, 1).fillRect(0, 0, game_width, game_height);
@@ -192,7 +197,13 @@ class GameScene extends Phaser.Scene {
 		});
 	}
 
+	setup() {}
+
 	drawBoard() {
+		let background = this.add.image(0, 0, "tatami");
+		background.setOrigin(0, 0);
+		background.displayWidth = game_width;
+		background.displayHeight = game_height;
 		for (let x = 0; x < 9; x++) {
 			for (let y = 0; y < 9; y++) {
 				switch (board[x][y]) {
@@ -211,34 +222,21 @@ class GameScene extends Phaser.Scene {
 		for (let x = 0; x < 9; x++) {
 			for (let y = 0; y < 9; y++) {
 				if (shogiPiece[x][y] != null) {
-					switch (shogiPiece[x][y].name) {
-						case "king":
-							let select =
-								shogiPiece[x][y]?.select !== undefined
-									? shogiPiece[x][y].select
-									: false;
-							shogiPiece[x][y].destroy();
-							if (shadow != null) shadow.destroy();
-							if (select) {
-								shadow = this.add.image(x * 64 + 64 + 8, y * 64 + 256 + 8, "king");
-								shadow.tint = 0x000000;
-								shadow.alpha = 0.6;
-								shogiPiece[x][y] = this.add.image(
-									x * 64 + 64,
-									y * 64 + 256,
-									"king"
-								);
-							} else {
-								shogiPiece[x][y] = this.add.image(
-									x * 64 + 64,
-									y * 64 + 256,
-									"king"
-								);
-							}
-							shogiPiece[x][y].name = "king";
-							shogiPiece[x][y].select = select;
-							break;
+					let select = shogiPiece[x][y]?.select;
+					let piece_type = shogiPiece[x][y].piece_type;
+					let name = shogiPiece[x][y]?.name;
+					shogiPiece[x][y].destroy();
+					if (select) {
+						let shadow = this.add.image(x * 64 + 64 + 8, y * 64 + 256 + 8, name);
+						shadow.tint = 0x000000;
+						shadow.alpha = 0.6;
 					}
+					shogiPiece[x][y] = this.add.image(x * 64 + 64, y * 64 + 256, name);
+					if (piece_type === "player") shogiPiece[x][y].angle = 0;
+					else shogiPiece[x][y].angle = 180;
+					shogiPiece[x][y].name = name;
+					shogiPiece[x][y].select = select;
+					shogiPiece[x][y].piece_type = piece_type;
 				}
 			}
 		}
@@ -253,42 +251,44 @@ class GameScene extends Phaser.Scene {
 					pointer.y >= y * 64 + 256 - 32 &&
 					pointer.y < y * 64 + 256 + 32
 				) {
-					if (select_object == null) {
-						switch (shogiPiece[x][y]?.name) {
-							case "king":
-								shogiPiece[x][y].select = true;
-								select_object = shogiPiece[x][y];
-								for (let dx = -1; dx <= 1; dx++) {
-									for (let dy = -1; dy <= 1; dy++) {
-										if (dx === 0 && dy === 0) continue;
-										if (
-											x + dx >= 0 &&
-											x + dx < 9 &&
-											y + dy >= 0 &&
-											y + dy < 9
-										) {
-											if (shogiPiece[x + dx][y + dy] == null) {
-												board[x + dx][y + dy] = 1;
+					if (shogiPiece[x][y]?.piece_type === "player") {
+						if (select_object == null) {
+							switch (shogiPiece[x][y]?.name) {
+								case "king":
+									shogiPiece[x][y].select = true;
+									select_object = shogiPiece[x][y];
+									for (let dx = -1; dx <= 1; dx++) {
+										for (let dy = -1; dy <= 1; dy++) {
+											if (dx === 0 && dy === 0) continue;
+											if (
+												x + dx >= 0 &&
+												x + dx < 9 &&
+												y + dy >= 0 &&
+												y + dy < 9
+											) {
+												if (shogiPiece[x + dx][y + dy] == null) {
+													board[x + dx][y + dy] = 1;
+												}
 											}
 										}
 									}
-								}
-								break;
-						}
-					} else {
-						if (shogiPiece[x][y]?.select) {
-							shogiPiece[x][y].select = false;
-							select_object = null;
-							for (let i = 0; i < 9; i++) {
-								for (let j = 0; j < 9; j++) {
-									board[i][j] = 0;
+									break;
+							}
+						} else {
+							if (shogiPiece[x][y]?.select) {
+								shogiPiece[x][y].select = false;
+								select_object = null;
+								for (let i = 0; i < 9; i++) {
+									for (let j = 0; j < 9; j++) {
+										board[i][j] = 0;
+									}
 								}
 							}
 						}
+						this.drawBoard();
+						this.drawObject();
+						return;
 					}
-					this.drawBoard();
-					this.drawObject();
-					return;
 				}
 			}
 		}
@@ -315,6 +315,7 @@ class GameScene extends Phaser.Scene {
 											shogiPiece[x1][y1].texture
 										);
 										shogiPiece[x][y].name = shogiPiece[x1][y1].name;
+										shogiPiece[x][y].piece_type = shogiPiece[x1][y1].piece_type;
 										shogiPiece[x][y].select = false;
 										shogiPiece[x1][y1].destroy();
 										shogiPiece[x1][y1] = null;
@@ -334,8 +335,8 @@ class GameScene extends Phaser.Scene {
 					}
 				}
 			}
-			return false;
 		}
+		return false;
 	}
 
 	update(time, delta) {
