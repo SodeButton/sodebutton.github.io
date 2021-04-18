@@ -154,7 +154,8 @@ class StartScene extends Phaser.Scene {
 
 let board = [];
 let shogiPiece = [];
-let shogiPieceWait = [];
+let boardWait = new Array(9);
+let shogiPieceWait = new Array(9);
 
 let se = [];
 let isFade = false;
@@ -167,6 +168,8 @@ for (let i = 0; i < 9; i++) {
 	board[i] = new Array(9).fill(0);
 	shogiPiece[i] = new Array(9).fill(null);
 }
+boardWait.fill(0);
+shogiPieceWait.fill(0);
 
 class GameScene extends Phaser.Scene {
 	constructor() {
@@ -180,10 +183,15 @@ class GameScene extends Phaser.Scene {
 		background.displayHeight = game_height;
 		await this.drawBoard();
 
-		shogiPiece[4][0] = this.add.image(4 * 64 + 64, 256, "fu");
-		shogiPiece[4][0].piece_type = "enemy";
-		shogiPiece[4][0].name = "fu";
-		shogiPiece[4][0].select = false;
+		shogiPiece[5][0] = this.add.image(5 * 64 + 64, 256, "fu");
+		shogiPiece[5][0].piece_type = "enemy";
+		shogiPiece[5][0].name = "fu";
+		shogiPiece[5][0].select = false;
+
+		shogiPiece[3][0] = this.add.image(3 * 64 + 64, 256, "fu");
+		shogiPiece[3][0].piece_type = "enemy";
+		shogiPiece[3][0].name = "fu";
+		shogiPiece[3][0].select = false;
 
 		shogiPiece[4][8] = this.add.image(4 * 64 + 64, 8 * 64 + 256, "king");
 		shogiPiece[4][8].piece_type = "player";
@@ -229,6 +237,20 @@ class GameScene extends Phaser.Scene {
 				}
 			}
 		}
+
+		for (let x = 0; x < 9; x++) {
+			switch (boardWait[x]) {
+				case 0:
+					this.add.image(x * 64 + 64, 9 * 64 + 288, "board_chip");
+					break;
+				case 1:
+					this.add.image(x * 64 + 64, 9 * 64 + 288, "input_board_chip");
+					break;
+				case 2:
+					this.add.image(x * 64 + 64, 9 * 64 + 288, "enemy_board_chip");
+					break;
+			}
+		}
 	}
 
 	drawObject() {
@@ -253,6 +275,20 @@ class GameScene extends Phaser.Scene {
 					shogiPiece[x][y].piece_type = piece_type;
 				}
 			}
+		}
+		let fu = this.add.image(64, 9 * 64 + 288, "fu");
+		if (shogiPieceWait[0] <= 0) {
+			fu.alpha = 0;
+		} else {
+			fu.alpha = 1;
+
+			let text = this.add.text(64 + 12, 9 * 64 + 290, shogiPieceWait[0] + "", {
+				fontSize: "40px",
+				fontFamily: "mohitsuFont",
+				color: "#00ff00",
+				padding: { left: 0, right: 0, bottom: 0, top: 4 },
+			});
+			text.setOrigin(0, 0);
 		}
 	}
 
@@ -343,14 +379,23 @@ class GameScene extends Phaser.Scene {
 											this.drawObject();
 											return true;
 										} else if (board[x][y] === 2) {
+											let shogi = shogiPiece[x][y];
 											shogiPiece[x][y] = this.add.image(
 												x1 * 64 + 64,
 												y1 * 64 + 256,
 												shogiPiece[x1][y1].texture
 											);
+
 											shogiPiece[x][y].name = shogiPiece[x1][y1].name;
 											shogiPiece[x][y].piece_type = "player";
 											shogiPiece[x][y].select = false;
+											console.log(shogi.name);
+											switch (shogi.name) {
+												case "fu":
+													shogiPieceWait[0]++;
+													break;
+											}
+
 											shogiPiece[x1][y1].destroy();
 											shogiPiece[x1][y1] = null;
 											select_object = null;
