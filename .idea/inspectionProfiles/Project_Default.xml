@@ -5,7 +5,7 @@
       <scope name="Project Files" level="WEAK WARNING" enabled="true">
         <GlobalSettings restrictedDuplicateScope="SAME_FILE" />
         <Languages>
-          <language minSize="143" name="JavaScript" />
+          <language minSize="172" name="JavaScript" />
         </Languages>
       </scope>
     </inspection_tool>

@@ -6,6 +6,54 @@ let isClick = false;
 let fadeTime = 0;
 let fade;
 
+let logo;
+
+class LogoScene extends Phaser.Scene {
+	constructor() {
+		super({ key: "logoScene" });
+	}
+
+	preload() {
+		this.load.setPath("./Resources/Logos");
+		this.load.image("phaser_logo", "./PhaserLogo.png");
+	}
+
+	create() {
+		logo = this.add.image(game_width / 2, game_height / 2, "phaser_logo");
+		logo.setOrigin(0.5, 0.5);
+		logo.alpha = 0;
+		this.tweens.add({
+			targets: logo,
+			alpha: 1,
+			duration: 1000,
+			ease: "Power2",
+		});
+		isClick = true;
+	}
+
+	update(time, delta) {
+		fadeTime += delta / 1000;
+		if (isClick) {
+			if (fadeTime >= 1) {
+				fadeTime = 0;
+				isClick = false;
+				this.tweens.add({
+					targets: logo,
+					alpha: 0,
+					duration: 1000,
+					ease: "Power2",
+				});
+			}
+		} else {
+			if (fadeTime >= 1) {
+				fadeTime = 0;
+				isClick = false;
+				this.scene.start("loadScene");
+			}
+		}
+	}
+}
+
 class LoadScene extends Phaser.Scene {
 	constructor() {
 		super({ key: "loadScene" });
@@ -64,9 +112,8 @@ class LoadScene extends Phaser.Scene {
 		this.load.setPath("./Resources/Audios");
 		this.load.audio("se_shogi", "./se_shogi.wav");
 		this.load.audio("se_kill", "./se_kill.mp3");
-		// this.load.audio("shoot4", "./Audios/Shoot4.wav");
-		// this.load.audio("explosion1", "./Audios/Explosion1.wav");
-		// this.load.audio("bgm1", "./Audios/bgm1.ogg");
+		this.load.audio("bgm_title", "./bgm_title.mp3");
+		this.load.audio("bgm_game", "./bgm_game.mp3");
 	}
 
 	create() {
@@ -75,6 +122,8 @@ class LoadScene extends Phaser.Scene {
 }
 
 let title, tapText, versionText, copyrightText;
+
+let bgm_title;
 
 class StartScene extends Phaser.Scene {
 	constructor() {
@@ -102,7 +151,7 @@ class StartScene extends Phaser.Scene {
 		});
 		tapText.setOrigin(0.5, 0.5);
 
-		versionText = this.add.text(30, game_height - 10, "Ver beta0.0.2", {
+		versionText = this.add.text(30, game_height - 10, "Ver beta0.0.3", {
 			fontSize: "30px",
 			fontFamily: "mohitsuFont",
 			color: "#000000",
@@ -110,13 +159,16 @@ class StartScene extends Phaser.Scene {
 		});
 		versionText.setOrigin(0, 1);
 
-		copyrightText = this.add.text(game_width - 30, game_height - 10, "(c)2021 Button501", {
+		copyrightText = this.add.text(game_width - 30, game_height - 10, "(c)2021 Button", {
 			fontSize: "30px",
 			fontFamily: "mohitsuFont",
 			color: "#000000",
 			padding: { left: 0, right: 0, bottom: 0, top: 4 },
 		});
 		copyrightText.setOrigin(1, 1);
+
+		bgm_title = this.sound.add("bgm_title");
+		bgm_title.play();
 
 		fade = this.add.graphics();
 		fade.fillStyle(0x000000, 1).fillRect(0, 0, game_width, game_height);
@@ -127,6 +179,12 @@ class StartScene extends Phaser.Scene {
 				this.tweens.add({
 					targets: fade,
 					alpha: 1,
+					duration: 1000,
+					ease: "Power2",
+				});
+				this.tweens.add({
+					targets: bgm_title,
+					volume: 0,
 					duration: 1000,
 					ease: "Power2",
 				});
@@ -146,6 +204,7 @@ class StartScene extends Phaser.Scene {
 			fadeTime += delta / 1000;
 			if (fadeTime >= 1.0) {
 				fadeTime = 0;
+				bgm_title.stop();
 				this.scene.start("gameScene");
 			}
 		}
@@ -158,6 +217,9 @@ let boardWait = new Array(9);
 let shogiPieceWait = new Array(9);
 
 let se = [];
+
+let bgm_game;
+
 let isFade = false;
 let isDown = false;
 let select_object = null;
@@ -210,6 +272,9 @@ class GameScene extends Phaser.Scene {
 			duration: 1000,
 			ease: "Power2",
 		});
+
+		bgm_game = this.sound.add("bgm_game");
+		bgm_game.play();
 
 		se.shogi = this.sound.add("se_shogi");
 		se.kill = this.sound.add("se_kill");
@@ -500,7 +565,7 @@ const config = {
 			gravity: { y: 0 },
 		},
 	},
-	scene: [LoadScene, StartScene, GameScene],
+	scene: [LogoScene, LoadScene, StartScene, GameScene],
 };
 
 const game = new Phaser.Game(config);
