@@ -102,7 +102,7 @@ class StartScene extends Phaser.Scene {
 		});
 		tapText.setOrigin(0.5, 0.5);
 
-		versionText = this.add.text(30, game_height - 10, "Ver beta0.0.1", {
+		versionText = this.add.text(30, game_height - 10, "Ver beta0.0.2", {
 			fontSize: "30px",
 			fontFamily: "mohitsuFont",
 			color: "#000000",
