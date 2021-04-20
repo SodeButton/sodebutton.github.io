@@ -389,7 +389,7 @@ class GameScene extends Phaser.Scene {
 								case "fu":
 									shogiPiece[x][y].select = true;
 									select_object = shogiPiece[x][y];
-									if (y - 1 > 1) {
+									if (y - 1 >= 0) {
 										if (shogiPiece[x][y - 1] == null) {
 											board[x][y - 1] = 1;
 										} else if (shogiPiece[x][y - 1].piece_type === "enemy") {
@@ -488,12 +488,16 @@ class GameScene extends Phaser.Scene {
 									if (shogiPiece[x1][y1]?.select) {
 										game_turn = "enemy";
 										if (board[x][y] === 1) {
-											shogiPiece[x][y] = this.add.image(
-												x1 * 64 + 64,
-												y1 * 64 + 256,
-												shogiPiece[x1][y1].texture
-											);
-											shogiPiece[x][y].name = shogiPiece[x1][y1].name;
+											let name = shogiPiece[x1][y1].name;
+											if (y <= 3) {
+												switch (name) {
+													case "fu":
+														name = "fu_nari";
+														break;
+												}
+											}
+											shogiPiece[x][y] = this.add.image(x1 * 64 + 64, y1 * 64 + 256, name);
+											shogiPiece[x][y].name = name;
 											shogiPiece[x][y].piece_type = shogiPiece[x1][y1].piece_type;
 											shogiPiece[x][y].select = false;
 											shogiPiece[x1][y1].destroy();
@@ -519,7 +523,6 @@ class GameScene extends Phaser.Scene {
 											shogiPiece[x][y].name = shogiPiece[x1][y1].name;
 											shogiPiece[x][y].piece_type = "player";
 											shogiPiece[x][y].select = false;
-											console.log(shogi.name);
 											switch (shogi.name) {
 												case "fu":
 													shogiPieceWait[0]++;
