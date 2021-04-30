@@ -108,6 +108,7 @@ class LoadScene extends Phaser.Scene {
 		this.load.image("input_board_chip", "./input_board_chip.png");
 		this.load.image("enemy_board_chip", "./enemy_board_chip.png");
 		this.load.image("tatami", "./tatami.jpg");
+		this.load.image("window", "./window.png");
 
 		this.load.setPath("./Resources/Audios");
 		this.load.audio("se_shogi", "./se_shogi.wav");
@@ -454,6 +455,10 @@ class GameScene extends Phaser.Scene {
 		}
 	}
 
+	showNariWin() {
+		let window = this.add.image(game_width / 2, game_height / 2, "window");
+	}
+
 	selectMovementPos(pointer) {
 		if (select_object != null) {
 			for (let x = 0; x < 9; x++) {
@@ -492,7 +497,22 @@ class GameScene extends Phaser.Scene {
 											if (y <= 3) {
 												switch (name) {
 													case "fu":
-														name = "fu_nari";
+														name += "_nari";
+														break;
+													case "kyosha":
+														name += "_nari";
+														break;
+													case "kema":
+														name += "_nari";
+														break;
+													case "silver":
+														name += "_nari";
+														break;
+													case "kaku":
+														name += "_nari";
+														break;
+													case "hisha":
+														name += "_nari";
 														break;
 												}
 											}
@@ -526,6 +546,42 @@ class GameScene extends Phaser.Scene {
 											switch (shogi.name) {
 												case "fu":
 													shogiPieceWait[0]++;
+													break;
+												case "fu_nari":
+													shogiPieceWait[0]++;
+													break;
+												case "kyosha":
+													shogiPieceWait[1]++;
+													break;
+												case "kyosha_nari":
+													shogiPieceWait[1]++;
+													break;
+												case "kema":
+													shogiPieceWait[2]++;
+													break;
+												case "kema_nari":
+													shogiPieceWait[2]++;
+													break;
+												case "silver":
+													shogiPieceWait[3]++;
+													break;
+												case "silver_nari":
+													shogiPieceWait[3]++;
+													break;
+												case "gold":
+													shogiPieceWait[4]++;
+													break;
+												case "kaku":
+													shogiPieceWait[5]++;
+													break;
+												case "kaku_nari":
+													shogiPieceWait[5]++;
+													break;
+												case "hisha":
+													shogiPieceWait[6]++;
+													break;
+												case "hisha_nari":
+													shogiPieceWait[6]++;
 													break;
 											}
 
