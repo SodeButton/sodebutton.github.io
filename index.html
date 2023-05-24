@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/assets/logo-120abf9e.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Buttome</title>
+  <script type="module" crossorigin src="/assets/index-284cb64a.js"></script>
+  <link rel="stylesheet" href="/assets/index-92cce706.css">
+</head>
+
+<body>
+    <div id="app"></div>
+    
+    <script>
+      ;(function (l) {
+        if (l.search) {
+          let q = {}
+          l.search
+            .slice(1)
+            .split("&")
+            .forEach(function (v) {
+              let a = v.split("=")
+              q[a[0]] = a[1]
+            })
+          if (q.p !== undefined) {
+            window.history.replaceState(
+              null,
+              null,
+              l.pathname.slice(0, -1) + (q.p || "")
+            )
+          }
+        }
+      })(window.location)
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Buttome</title>
+</head>
+<body>
+<script>
+  let count = 2
+  let l = window.location
+  let port = l.port ? ':' + l.port : ''
+  l.replace(
+    `${l.protocol}//${l.hostname}${port}/?p=${l.pathname.split('/').slice(0, 1 + count).join('/')}`
+  )
+</script>
+</body>
+</html>
