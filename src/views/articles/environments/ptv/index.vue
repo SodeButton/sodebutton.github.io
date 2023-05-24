@@ -65,7 +65,21 @@
       ></PreviewCommandLine>
 
       <p class="mt-8">起動画面</p>
-      <v-img :src="imgVtEnvironment" class="rounded-lg mt-2"></v-img>
+      <v-img
+        :src="imgVtEnvironment"
+        :lazy-src="imgVtEnvironment"
+        class="rounded-lg mt-2"
+        width="100%"
+      >
+        <template v-slot:placeholder>
+          <v-row class="fill-height ma-0" align="center" justify="center">
+            <v-progress-circular
+              indeterminate
+              color="grey lighten-5"
+            ></v-progress-circular>
+          </v-row>
+        </template>
+      </v-img>
 
       <h1 class="mt-10">TypeScriptとPhaserのインストール</h1>
       <v-divider :thickness="2" class="mb-4"></v-divider>
@@ -123,7 +137,21 @@
       ></PreviewCode>
 
       <p class="mt-8">起動画面</p>
-      <v-img :src="imgPhaserDev" class="rounded-lg mt-2"></v-img>
+      <v-img
+        :src="imgPhaserDev"
+        :lazy-src="imgPhaserDev"
+        class="rounded-lg mt-2"
+        width="100%"
+      >
+        <template v-slot:placeholder>
+          <v-row class="fill-height ma-0" align="center" justify="center">
+            <v-progress-circular
+              indeterminate
+              color="grey lighten-5"
+            ></v-progress-circular>
+          </v-row>
+        </template>
+      </v-img>
     </v-sheet>
   </v-container>
 </template>
@@ -265,12 +293,11 @@ export default {
   }),
   async mounted() {
     await fetch(
-      "https://api.github.com/repos/sodebutton/sodebutton.github.io/commits?path=src/views/articles/environments/ptv.vue"
+      "https://api.github.com/repos/sodebutton/sodebutton.github.io/commits?path=src/views/articles/environments/ptv/index.vue"
     )
       .then((response) => response.json())
       .then((info) => info[0]["commit"]["committer"]["date"])
       .then((d) => {
-        console.log(d);
         const date = new Date(d);
         this.updated =
           date.getFullYear() +
